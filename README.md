@@ -4,7 +4,7 @@
 * Version: 0.1.0
 
 ## Description
-Bad Piggies user data cryptor
+Bad Piggies user data cryptor<br>
 Encrypt or decrypt Progress.dat and .contraption file
 
 ## Usage
