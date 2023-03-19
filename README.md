@@ -5,3 +5,10 @@
 
 ## Description
 Bad Piggies user data cryptor
+Encrypt or decrypt Progress.dat and .contraption file
+
+## Usage
+`badpiggies_cryptor <FILE_TYPE> <CRYPTO_MODE> <INPUT_FILE> <OUTPUT_FILE>`
+
+### Example
+`badpiggies_cryptor progres decode Progress.dat Progress.dat.xml`
