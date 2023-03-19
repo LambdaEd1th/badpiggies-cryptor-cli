@@ -16,11 +16,8 @@ pub struct Cryptor<'a, 'b> {
 }
 
 impl<'a, 'b> Cryptor<'a, 'b> {
-    pub fn new(password: &'a [u8], salt: &'b [u8]) -> Cryptor<'a, 'b> {
-        Cryptor {
-            password,
-            salt,
-        }
+    pub fn new(password: &'a [u8], salt: &'b [u8]) -> Self {
+        Self { password, salt }
     }
 
     pub fn encrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn Error>> {
@@ -51,7 +48,7 @@ impl<'a, 'b> Cryptor<'a, 'b> {
 #[derive(Clone, Copy, Debug)]
 pub struct Sha1HashError;
 
-impl Display for Sha1HashError{
+impl Display for Sha1HashError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         f.write_str("SHA-1 check failed")
     }
