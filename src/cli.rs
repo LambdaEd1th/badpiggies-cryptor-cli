@@ -7,11 +7,11 @@ use clap::{Parser, ValueEnum};
 pub struct Cli {
     /// What file type to run the program in
     #[arg(value_enum)]
-    pub file_type: Types,
+    pub file_type: FileTypes,
 
     /// What crypto mode to run the program in
     #[arg(value_enum)]
-    pub crypto_mode: Modes,
+    pub crypto_mode: CryptoModes,
 
     /// Input file
     #[arg(value_name = "INPUT_FILE")]
@@ -23,13 +23,13 @@ pub struct Cli {
 }
 
 #[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
-pub enum Modes {
-    Encode,
-    Decode,
+pub enum CryptoModes {
+    Encrypt,
+    Decrypt,
 }
 
 #[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
-pub enum Types {
+pub enum FileTypes {
     Progress,
     Contraption,
 }
