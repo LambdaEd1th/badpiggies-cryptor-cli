@@ -45,7 +45,7 @@ impl<'a, 'b> Cryptor<'a, 'b> {
 }
 
 /// Failed hash error.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Sha1HashError;
 
 impl Display for Sha1HashError {
