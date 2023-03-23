@@ -14,7 +14,7 @@ use clap::Parser;
 fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let mut input_file = File::open(cli.input_file)?;
-    let mut input_buffer: Vec<u8> = vec![];
+    let mut input_buffer: Vec<u8> = Vec::new();
     input_file.read_to_end(&mut input_buffer)?;
     let output_buffer: Vec<u8>;
     match cli.file_type {
