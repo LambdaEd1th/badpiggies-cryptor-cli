@@ -10,13 +10,13 @@ type Aes256CbcEnc = cbc::Encryptor<aes::Aes256Enc>;
 type Aes256CbcDec = cbc::Decryptor<aes::Aes256Dec>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Cryptor<'a, 'b> {
-    pub password: &'a [u8],
-    pub salt: &'b [u8],
+pub struct Cryptor<'cryptor> {
+    pub password: &'cryptor [u8],
+    pub salt: &'cryptor [u8],
 }
 
-impl<'a, 'b> Cryptor<'a, 'b> {
-    pub fn new(password: &'a [u8], salt: &'b [u8]) -> Self {
+impl<'cryptor> Cryptor<'cryptor> {
+    pub fn new(password: &'cryptor [u8], salt: &'cryptor [u8]) -> Self {
         Self { password, salt }
     }
 
