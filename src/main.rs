@@ -4,7 +4,7 @@ use std::{
     io::{Read, Write},
 };
 
-use badpiggies_cryptor::{
+use badpiggies_cryptor_cli::{
     cli::{Cli, CryptoModes, FileTypes},
     constant_items,
     crypto::{Cryptor, Sha1HashError},
