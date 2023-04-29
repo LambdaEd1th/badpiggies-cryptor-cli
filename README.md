@@ -1,7 +1,7 @@
 # Bad Piggies Cryptor
 
 * Author: ed1th
-* Version: 0.1.3
+* Version: 0.2.0
 
 ## Description
 Bad Piggies user data cryptor<br>

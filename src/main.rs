@@ -7,7 +7,7 @@ use std::{
 use badpiggies_cryptor_cli::{
     cli::{Cli, CryptoModes, FileTypes},
     constant_items,
-    crypto::{Cryptor, Sha1HashError},
+    crypto::Cryptor,
 };
 use clap::Parser;
 
@@ -22,18 +22,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             let cryptor = Cryptor::new(constant_items::PROGRESS_PASSWORD, constant_items::SALT);
             match cli.crypto_mode {
                 CryptoModes::Encrypt => {
-                    let cipher_buffer = cryptor.encrypt(&input_buffer)?;
-                    let sha1_buffer = Cryptor::sha1_hash(&cipher_buffer);
-                    output_buffer = [sha1_buffer, cipher_buffer].concat();
+                    output_buffer = cryptor.encrypt_with_sha1_hash(&input_buffer)?;
                 }
                 CryptoModes::Decrypt => {
-                    let sha1_slice = &input_buffer[..20];
-                    let cipher_slice = &input_buffer[20..];
-                    if sha1_slice != &Cryptor::sha1_hash(cipher_slice) {
-                        return Err(From::from(Sha1HashError));
-                    }
-                    let cipher_buffer: Vec<u8> = cipher_slice.to_vec();
-                    output_buffer = cryptor.decrypt(&cipher_buffer)?;
+                    output_buffer = cryptor.decrypt_with_sha1_hash(&input_buffer)?;
                 }
             }
         }
