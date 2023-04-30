@@ -13,6 +13,5 @@ Encrypt or decrypt Progress.dat and .contraption file
 ### Example
 #### Decrypt Progress.dat file
 `badpiggies_cryptor progress decrypt Progress.dat Progress.dat.xml`
-
 #### Encrypt .contraption file
 `badpiggies_cryptor contraption encrypt example.contraption.xml example.contraption`
