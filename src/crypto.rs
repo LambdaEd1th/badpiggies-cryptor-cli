@@ -11,8 +11,8 @@ type Aes256CbcDec = cbc::Decryptor<aes::Aes256Dec>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cryptor<'cryptor> {
-    pub password: &'cryptor [u8],
-    pub salt: &'cryptor [u8],
+    password: &'cryptor [u8],
+    salt: &'cryptor [u8],
 }
 
 impl<'cryptor> Cryptor<'cryptor> {
@@ -43,8 +43,7 @@ impl<'cryptor> Cryptor<'cryptor> {
                 "SHA-1 contents too short".to_owned(),
             )));
         }
-        let sha1_slice = &buffer[..20];
-        let cipher_slice = &buffer[20..];
+        let (sha1_slice, cipher_slice) = buffer.split_at(20);
         if sha1_slice != Self::sha1_hash(cipher_slice) {
             return Err(Box::new(CryptorError::Sha1HashError(
                 "SHA-1 checking failed".to_owned(),
