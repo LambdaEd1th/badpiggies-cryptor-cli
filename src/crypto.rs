@@ -55,8 +55,8 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     fn aes_encrypt(
         &self,
-        key: &[u8; 32],
-        iv: &[u8; 16],
+        key: &[u8],
+        iv: &[u8],
         buffer: &[u8],
     ) -> Result<Vec<u8>, Box<dyn StdError>> {
         let encryptor = Aes256CbcEnc::new(key.into(), iv.into());
@@ -65,8 +65,8 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     fn aes_decrypt(
         &self,
-        key: &[u8; 32],
-        iv: &[u8; 16],
+        key: &[u8],
+        iv: &[u8],
         buffer: &[u8],
     ) -> Result<Vec<u8>, Box<dyn StdError>> {
         let decryptor = Aes256CbcDec::new(key.into(), iv.into());
@@ -79,7 +79,8 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     fn rfc2898_derive_bytes(&self) -> Result<([u8; 32], [u8; 16]), Box<dyn StdError>> {
         let bytes = pbkdf2::pbkdf2_hmac_array::<Sha1, 48>(self.password, self.salt, 1000);
-        Ok((bytes[..32].try_into()?, bytes[32..].try_into()?))
+        let (key, iv) = bytes.split_at(32);
+        Ok((key.try_into()?, iv.try_into()?))
     }
 }
 
