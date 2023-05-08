@@ -22,12 +22,12 @@ impl<'cryptor> Cryptor<'cryptor> {
     }
 
     pub fn encrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn StdError>> {
-        let (key, iv) = Self::rfc2898_derive_bytes(&self)?;
+        let (key, iv) = Self::rfc2898_derive_bytes(&self);
         Ok(Self::aes_encrypt(&self, &key, &iv, buffer)?)
     }
 
     pub fn decrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn StdError>> {
-        let (key, iv) = Self::rfc2898_derive_bytes(&self)?;
+        let (key, iv) = Self::rfc2898_derive_bytes(&self);
         Ok(Self::aes_decrypt(&self, &key, &iv, buffer)?)
     }
 
@@ -77,10 +77,10 @@ impl<'cryptor> Cryptor<'cryptor> {
         Sha1::new_with_prefix(buffer).finalize().to_vec()
     }
 
-    fn rfc2898_derive_bytes(&self) -> Result<([u8; 32], [u8; 16]), Box<dyn StdError>> {
+    fn rfc2898_derive_bytes(&self) -> (Vec<u8>, Vec<u8>) {
         let bytes = pbkdf2::pbkdf2_hmac_array::<Sha1, 48>(self.password, self.salt, 1000);
         let (key, iv) = bytes.split_at(32);
-        Ok((key.try_into()?, iv.try_into()?))
+        (key.to_owned(), iv.to_owned())
     }
 }
 
