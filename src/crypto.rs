@@ -88,7 +88,7 @@ impl FmtDisplay for CryptorError {
     fn fmt(&self, f: &mut FmtFormatter<'_>) -> FmtResult {
         match self {
             Self::Sha1HashError(s) => write!(f, "Sha1HashError: {}", s),
-            Self::AesCryptoError(s) => write!(f, "Sha1HashError: {}", s),
+            Self::AesCryptoError(s) => write!(f, "AesCryptoError: {}", s),
         }
     }
 }
