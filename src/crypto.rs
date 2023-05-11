@@ -3,7 +3,10 @@ use std::{
     fmt::{Display as FmtDisplay, Formatter as FmtFormatter, Result as FmtResult},
 };
 
-use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
+use aes::cipher::{
+    block_padding::{Pkcs7, UnpadError},
+    BlockDecryptMut, BlockEncryptMut, KeyIvInit,
+};
 use sha1::{Digest, Sha1};
 
 type Aes256CbcEnc = cbc::Encryptor<aes::Aes256Enc>;
@@ -21,54 +24,44 @@ impl<'cryptor> Cryptor<'cryptor> {
         Self { password, salt }
     }
 
-    pub fn encrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn StdError>> {
+    pub fn encrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let (key, iv) = Self::rfc2898_derive_bytes(&self);
         Ok(Self::aes_encrypt(&self, &key, &iv, buffer)?)
     }
 
-    pub fn decrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn StdError>> {
+    pub fn decrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let (key, iv) = Self::rfc2898_derive_bytes(&self);
         Ok(Self::aes_decrypt(&self, &key, &iv, buffer)?)
     }
 
-    pub fn encrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn StdError>> {
+    pub fn encrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let cipher_buffer = self.encrypt(&buffer)?;
         let sha1_buffer = Self::sha1_hash(&cipher_buffer);
         Ok([sha1_buffer, cipher_buffer].concat())
     }
 
-    pub fn decrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, Box<dyn StdError>> {
+    pub fn decrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         if buffer.len() < 20 {
-            return Err(Box::new(CryptorError::Sha1HashError(
+            return Err(CryptorError::Sha1HashError(
                 "SHA-1 contents too short".to_owned(),
-            )));
+            ));
         }
         let (sha1_slice, cipher_slice) = buffer.split_at(20);
         if sha1_slice != Self::sha1_hash(cipher_slice) {
-            return Err(Box::new(CryptorError::Sha1HashError(
+            return Err(CryptorError::Sha1HashError(
                 "SHA-1 checking failed".to_owned(),
-            )));
+            ));
         }
         let cipher_buffer: Vec<u8> = cipher_slice.to_vec();
         Ok(Self::decrypt(&self, &cipher_buffer)?)
     }
 
-    fn aes_encrypt(
-        &self,
-        key: &[u8],
-        iv: &[u8],
-        buffer: &[u8],
-    ) -> Result<Vec<u8>, Box<dyn StdError>> {
+    fn aes_encrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let encryptor = Aes256CbcEnc::new(key.into(), iv.into());
         Ok(encryptor.encrypt_padded_vec_mut::<Pkcs7>(buffer))
     }
 
-    fn aes_decrypt(
-        &self,
-        key: &[u8],
-        iv: &[u8],
-        buffer: &[u8],
-    ) -> Result<Vec<u8>, Box<dyn StdError>> {
+    fn aes_decrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let decryptor = Aes256CbcDec::new(key.into(), iv.into());
         Ok(decryptor.decrypt_padded_vec_mut::<Pkcs7>(buffer)?)
     }
@@ -88,13 +81,21 @@ impl<'cryptor> Cryptor<'cryptor> {
 pub enum CryptorError {
     // Failed hash error
     Sha1HashError(String),
+    AesCryptoError(String),
 }
 
 impl FmtDisplay for CryptorError {
     fn fmt(&self, f: &mut FmtFormatter<'_>) -> FmtResult {
         match self {
             Self::Sha1HashError(s) => write!(f, "Sha1HashError: {}", s),
+            Self::AesCryptoError(s) => write!(f, "Sha1HashError: {}", s),
         }
+    }
+}
+
+impl From<UnpadError> for CryptorError {
+    fn from(value: UnpadError) -> Self {
+        Self::AesCryptoError(value.to_string())
     }
 }
 
