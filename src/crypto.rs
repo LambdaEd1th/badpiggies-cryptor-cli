@@ -36,7 +36,7 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     pub fn encrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let cipher_buffer = self.encrypt(&buffer)?;
-        let sha1_buffer = self.sha1_hash(&cipher_buffer);
+        let sha1_buffer = Self::sha1_hash(&cipher_buffer);
         Ok([sha1_buffer, cipher_buffer].concat())
     }
 
@@ -47,7 +47,7 @@ impl<'cryptor> Cryptor<'cryptor> {
             ));
         }
         let (sha1_slice, cipher_slice) = buffer.split_at(20);
-        if sha1_slice != self.sha1_hash(cipher_slice) {
+        if sha1_slice != Self::sha1_hash(cipher_slice) {
             return Err(CryptorError::Sha1HashError(
                 "SHA-1 checking failed".to_owned(),
             ));
@@ -66,7 +66,7 @@ impl<'cryptor> Cryptor<'cryptor> {
         Ok(decryptor.decrypt_padded_vec_mut::<Pkcs7>(buffer)?)
     }
 
-    fn sha1_hash(&self, buffer: &[u8]) -> Vec<u8> {
+    fn sha1_hash(buffer: &[u8]) -> Vec<u8> {
         Sha1::new_with_prefix(buffer).finalize().to_vec()
     }
 
