@@ -1,8 +1,3 @@
-use std::{
-    error::Error as StdError,
-    fmt::{Display as FmtDisplay, Formatter as FmtFormatter, Result as FmtResult},
-};
-
 use aes::cipher::{
     block_padding::{Pkcs7, UnpadError},
     BlockDecryptMut, BlockEncryptMut, KeyIvInit,
@@ -84,8 +79,8 @@ pub enum CryptorError {
     AesCryptoError(String),
 }
 
-impl FmtDisplay for CryptorError {
-    fn fmt(&self, f: &mut FmtFormatter<'_>) -> FmtResult {
+impl std::fmt::Display for CryptorError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Sha1HashError(s) => write!(f, "Sha1HashError: {}", s),
             Self::AesCryptoError(s) => write!(f, "AesCryptoError: {}", s),
@@ -93,10 +88,10 @@ impl FmtDisplay for CryptorError {
     }
 }
 
-impl From<UnpadError> for CryptorError {
+impl From<aes::cipher::block_padding::UnpadError> for CryptorError {
     fn from(value: UnpadError) -> Self {
         Self::AesCryptoError(value.to_string())
     }
 }
 
-impl StdError for CryptorError {}
+impl std::error::Error for CryptorError {}
