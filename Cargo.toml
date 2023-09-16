@@ -13,6 +13,5 @@ license = "GPL-3.0-or-later"
 aes = { version = "0.8.3" }
 sha1 = { version = "0.10.5" }
 cbc = { version = "0.1.2", features = ["std"] }
-pbkdf2 = { version = "0.12.2", features = ["hmac"]}
-clap = { version = "4.4.3", features = ["derive"] }
-
+pbkdf2 = { version = "0.12.2", features = ["hmac"] }
+clap = { version = "4.4.3", features = ["derive", "help"] }
