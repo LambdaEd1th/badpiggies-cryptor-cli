@@ -1,6 +1,6 @@
 [package]
 name = "badpiggies-cryptor-cli"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 authors = ["ed1th"]
 description = "Bad Piggies user data cryptor"
@@ -10,9 +10,9 @@ license = "GPL-3.0-or-later"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-aes = { version = "0.8.2" }
+aes = { version = "0.8.3" }
 sha1 = { version = "0.10.5" }
 cbc = { version = "0.1.2", features = ["std"] }
-pbkdf2 = { version = "0.12.1", features = ["hmac"]}
-clap = { version = "4.2.7", features = ["derive"] }
+pbkdf2 = { version = "0.12.2", features = ["hmac"]}
+clap = { version = "4.4.3", features = ["derive"] }
 
