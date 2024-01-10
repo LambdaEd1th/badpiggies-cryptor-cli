@@ -11,7 +11,7 @@ license = "GPL-3.0-or-later"
 
 [dependencies]
 aes = { version = "0.8.3" }
-sha1 = { version = "0.10.5" }
+sha1 = { version = "0.10.6" }
 cbc = { version = "0.1.2", features = ["std"] }
 pbkdf2 = { version = "0.12.2", features = ["hmac"] }
-clap = { version = "4.4.3", features = ["derive", "help"] }
+clap = { version = "4.4.14", features = ["derive", "help"] }

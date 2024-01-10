@@ -1,5 +1,5 @@
 use aes::cipher::{
-    block_padding::{Pkcs7, UnpadError},
+    block_padding::Pkcs7,
     BlockDecryptMut, BlockEncryptMut, KeyIvInit,
 };
 use sha1::{Digest, Sha1};
@@ -21,7 +21,9 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     pub fn encrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let (key, iv) = self.rfc2898_derive_bytes();
-        Ok(Self::aes_encrypt(&self, &key, &iv, buffer)?)
+        let cipher = Self::aes_encrypt(&self, &key, &iv, buffer)
+            .map_err(|e| CryptorError::AesCryptoError(e.to_string()))?;
+        Ok(cipher)
     }
 
     pub fn decrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
@@ -30,7 +32,9 @@ impl<'cryptor> Cryptor<'cryptor> {
     }
 
     pub fn encrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
-        let cipher_buffer = self.encrypt(&buffer)?;
+        let cipher_buffer = self
+            .encrypt(&buffer)
+            .map_err(|e| CryptorError::Sha1HashError(e.to_string()))?;
         let sha1_buffer = Self::sha1_hash(&cipher_buffer);
         Ok([sha1_buffer, cipher_buffer].concat())
     }
@@ -58,7 +62,10 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     fn aes_decrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let decryptor = Aes256CbcDec::new(key.into(), iv.into());
-        Ok(decryptor.decrypt_padded_vec_mut::<Pkcs7>(buffer)?)
+        let plain = decryptor
+            .decrypt_padded_vec_mut::<Pkcs7>(buffer)
+            .map_err(|e| CryptorError::AesCryptoError(e.to_string()))?;
+        Ok(plain)
     }
 
     fn sha1_hash(buffer: &[u8]) -> Vec<u8> {
@@ -85,12 +92,6 @@ impl std::fmt::Display for CryptorError {
             Self::Sha1HashError(s) => write!(f, "Sha1HashError: {}", s),
             Self::AesCryptoError(s) => write!(f, "AesCryptoError: {}", s),
         }
-    }
-}
-
-impl From<aes::cipher::block_padding::UnpadError> for CryptorError {
-    fn from(value: UnpadError) -> Self {
-        Self::AesCryptoError(value.to_string())
     }
 }
 
