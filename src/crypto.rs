@@ -1,7 +1,4 @@
-use aes::cipher::{
-    block_padding::Pkcs7,
-    BlockDecryptMut, BlockEncryptMut, KeyIvInit,
-};
+use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, BlockEncryptMut, KeyIvInit};
 use sha1::{Digest, Sha1};
 
 type Aes256CbcEnc = cbc::Encryptor<aes::Aes256Enc>;
@@ -40,18 +37,22 @@ impl<'cryptor> Cryptor<'cryptor> {
     }
 
     pub fn decrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
-        if buffer.len() < 20 {
-            return Err(CryptorError::Sha1HashError(
-                "SHA-1 contents too short".to_owned(),
-            ));
-        }
-        let (sha1_slice, cipher_slice) = buffer.split_at(20);
-        if sha1_slice != Self::sha1_hash(cipher_slice) {
-            return Err(CryptorError::Sha1HashError(
-                "SHA-1 checking failed".to_owned(),
-            ));
-        }
-        let cipher_buffer: Vec<u8> = cipher_slice.to_vec();
+        let (sha1_slice, cipher_slice) = match buffer.len() >= 20 {
+            true => buffer.split_at(20),
+            false => {
+                return Err(CryptorError::Sha1HashError(
+                    "SHA-1 contents too short".to_owned(),
+                ));
+            }
+        };
+        let cipher_buffer: Vec<u8> = match sha1_slice == Self::sha1_hash(cipher_slice) {
+            true => cipher_slice.to_owned(),
+            false => {
+                return Err(CryptorError::Sha1HashError(
+                    "SHA-1 checking failed".to_owned(),
+                ));
+            },
+        };
         Ok(Self::decrypt(&self, &cipher_buffer)?)
     }
 
