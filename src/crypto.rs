@@ -58,7 +58,8 @@ impl<'cryptor> Cryptor<'cryptor> {
 
     fn aes_encrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
         let encryptor = Aes256CbcEnc::new(key.into(), iv.into());
-        Ok(encryptor.encrypt_padded_vec_mut::<Pkcs7>(buffer))
+        let cipher = encryptor.encrypt_padded_vec_mut::<Pkcs7>(buffer);
+        Ok(cipher)
     }
 
     fn aes_decrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
