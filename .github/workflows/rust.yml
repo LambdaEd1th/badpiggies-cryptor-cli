@@ -51,6 +51,10 @@ jobs:
             OS: windows-latest
           - TARGET: x86_64-pc-windows-msvc # tested on a windows machine
             OS: windows-latest
+          - TARGET: aarch64-pc-windows-gnullvm # tested on a windows machine
+            OS: windows-latest
+          - TARGET: aarch64-pc-windows-msvc # tested on a windows machine
+            OS: windows-latest
     needs: test
     runs-on: ${{ matrix.OS }}
     env:
