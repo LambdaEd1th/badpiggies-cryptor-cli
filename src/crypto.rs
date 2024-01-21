@@ -6,39 +6,43 @@ type Aes256CbcDec = cbc::Decryptor<aes::Aes256Dec>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cryptor<'cryptor> {
-    password: &'cryptor [u8],
-    salt: &'cryptor [u8],
+    file_buffer: &'cryptor [u8],
 }
 
 impl<'cryptor> Cryptor<'cryptor> {
+    const SALT: &'static [u8] = &[
+        0x52, 0xA6, 0x42, 0x57, 0x92, 0x33, 0xB3, 0x6C, 0xF2, 0x6E, 0x62, 0xED, 0x7C,
+    ];
+    const PROGRESS_PASSWORD: &'static [u8] = b"56SA%FG42Dv5#4aG67f2";
+    const CONTRAPTION_PASSWORD: &'static [u8] = b"3b91A049Ca7HvSjhxT35";
+
     /// Creates a new [`Cryptor`].
-    pub fn new(password: &'cryptor [u8], salt: &'cryptor [u8]) -> Self {
-        Self { password, salt }
+    pub fn new(file_buffer: &'cryptor [u8]) -> Self {
+        Self { file_buffer }
     }
 
-    pub fn encrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
-        let (key, iv) = self.rfc2898_derive_bytes();
-        let cipher = Self::aes_encrypt(&self, &key, &iv, buffer)
-            .map_err(|e| CryptorError::AesCryptoError(e.to_string()))?;
-        Ok(cipher)
+    pub fn encrypt_contraption(&self) -> Vec<u8> {
+        let (key, iv) = Self::rfc2898_derive_bytes(Self::CONTRAPTION_PASSWORD);
+        let cipher_buffer = Self::aes_encrypt(&self, &key, &iv, self.file_buffer);
+        cipher_buffer
     }
 
-    pub fn decrypt(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
-        let (key, iv) = self.rfc2898_derive_bytes();
-        Ok(Self::aes_decrypt(&self, &key, &iv, buffer)?)
+    pub fn decrypt_contraption(&self) -> Result<Vec<u8>, CryptorError> {
+        let (key, iv) = Self::rfc2898_derive_bytes(Self::CONTRAPTION_PASSWORD);
+        let plain_buffer = Self::aes_decrypt(&self, &key, &iv, self.file_buffer)?;
+        Ok(plain_buffer)
     }
 
-    pub fn encrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
-        let cipher_buffer = self
-            .encrypt(&buffer)
-            .map_err(|e| CryptorError::Sha1HashError(e.to_string()))?;
+    pub fn encrypt_progress(&self) -> Vec<u8> {
+        let (key, iv) = Self::rfc2898_derive_bytes(Self::PROGRESS_PASSWORD);
+        let cipher_buffer = Self::aes_encrypt(&self, &key, &iv, self.file_buffer);
         let sha1_buffer = Self::sha1_hash(&cipher_buffer);
-        Ok([sha1_buffer, cipher_buffer].concat())
+        [sha1_buffer, cipher_buffer].concat()
     }
 
-    pub fn decrypt_with_sha1_hash(&self, buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
-        let (sha1_slice, cipher_slice) = match buffer.len() >= 20 {
-            true => buffer.split_at(20),
+    pub fn decrypt_progress(&self) -> Result<Vec<u8>, CryptorError> {
+        let (sha1_slice, cipher_slice) = match self.file_buffer.len() >= 20 {
+            true => self.file_buffer.split_at(20),
             false => {
                 return Err(CryptorError::Sha1HashError(
                     "SHA-1 contents too short".to_owned(),
@@ -51,15 +55,17 @@ impl<'cryptor> Cryptor<'cryptor> {
                 return Err(CryptorError::Sha1HashError(
                     "SHA-1 checking failed".to_owned(),
                 ));
-            },
+            }
         };
-        Ok(Self::decrypt(&self, &cipher_buffer)?)
+        let (key, iv) = Self::rfc2898_derive_bytes(Self::PROGRESS_PASSWORD);
+        let plain_buffer = Self::aes_decrypt(&self, &key, &iv, &cipher_buffer)?;
+        Ok(plain_buffer)
     }
 
-    fn aes_encrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
+    fn aes_encrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Vec<u8> {
         let encryptor = Aes256CbcEnc::new(key.into(), iv.into());
         let cipher = encryptor.encrypt_padded_vec_mut::<Pkcs7>(buffer);
-        Ok(cipher)
+        cipher
     }
 
     fn aes_decrypt(&self, key: &[u8], iv: &[u8], buffer: &[u8]) -> Result<Vec<u8>, CryptorError> {
@@ -74,8 +80,8 @@ impl<'cryptor> Cryptor<'cryptor> {
         Sha1::new_with_prefix(buffer).finalize().to_vec()
     }
 
-    fn rfc2898_derive_bytes(&self) -> (Vec<u8>, Vec<u8>) {
-        let bytes = pbkdf2::pbkdf2_hmac_array::<Sha1, 48>(self.password, self.salt, 1000);
+    fn rfc2898_derive_bytes(password: &[u8]) -> (Vec<u8>, Vec<u8>) {
+        let bytes = pbkdf2::pbkdf2_hmac_array::<Sha1, 48>(password, Self::SALT, 1000);
         let (key, iv) = bytes.split_at(32);
         (key.to_owned(), iv.to_owned())
     }

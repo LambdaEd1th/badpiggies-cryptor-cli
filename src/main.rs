@@ -4,11 +4,12 @@ use std::{
     io::{Read, Write},
 };
 
-use badpiggies_cryptor_cli::{
-    cli::{Cli, CryptoModes, FileTypes},
-    constant_items,
-    crypto::Cryptor,
-};
+mod crypto;
+use crypto::Cryptor;
+
+mod cli;
+use cli::{Cli, CryptoModes, FileTypes};
+
 use clap::Parser;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -17,26 +18,25 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut input_buffer: Vec<u8> = Vec::new();
     input_file.read_to_end(&mut input_buffer)?;
     let output_buffer: Vec<u8>;
+    let cryptor = Cryptor::new(&input_buffer);
     match cli.file_type {
         FileTypes::Progress => {
-            let cryptor = Cryptor::new(constant_items::PROGRESS_PASSWORD, constant_items::SALT);
             match cli.crypto_mode {
                 CryptoModes::Encrypt => {
-                    output_buffer = cryptor.encrypt_with_sha1_hash(&input_buffer)?;
+                    output_buffer = cryptor.encrypt_progress();
                 }
                 CryptoModes::Decrypt => {
-                    output_buffer = cryptor.decrypt_with_sha1_hash(&input_buffer)?;
+                    output_buffer = cryptor.decrypt_progress()?;
                 }
             }
         }
         FileTypes::Contraption => {
-            let cryptor = Cryptor::new(constant_items::CONTRAPTION_PASSWORD, constant_items::SALT);
             match cli.crypto_mode {
                 CryptoModes::Encrypt => {
-                    output_buffer = cryptor.encrypt(&input_buffer)?;
+                    output_buffer = cryptor.encrypt_contraption();
                 }
                 CryptoModes::Decrypt => {
-                    output_buffer = cryptor.decrypt(&input_buffer)?;
+                    output_buffer = cryptor.decrypt_contraption()?;
                 }
             }
         }
