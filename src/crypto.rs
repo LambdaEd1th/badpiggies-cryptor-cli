@@ -17,8 +17,8 @@ pub struct Cryptor<'cryptor> {
 
 impl<'cryptor> Cryptor<'cryptor> {
     /// Creates a new [`Cryptor`].
-    pub fn new(file_buffer: &'cryptor [u8]) -> Self {
-        Self { input_file: file_buffer }
+    pub fn new(input_file: &'cryptor [u8]) -> Self {
+        Self { input_file }
     }
 
     pub fn encrypt_contraption(&self) -> Vec<u8> {
