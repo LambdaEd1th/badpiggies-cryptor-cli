@@ -12,7 +12,7 @@ const CONTRAPTION_PASSWORD: &[u8] = b"3b91A049Ca7HvSjhxT35";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cryptor<'cryptor> {
-    input_file: &'cryptor [u8],
+    pub input_file: &'cryptor [u8],
 }
 
 impl<'cryptor> Cryptor<'cryptor> {
