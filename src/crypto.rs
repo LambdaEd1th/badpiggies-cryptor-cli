@@ -12,37 +12,37 @@ const CONTRAPTION_PASSWORD: &[u8] = b"3b91A049Ca7HvSjhxT35";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Cryptor<'cryptor> {
-    file_buffer: &'cryptor [u8],
+    input_file: &'cryptor [u8],
 }
 
 impl<'cryptor> Cryptor<'cryptor> {
     /// Creates a new [`Cryptor`].
     pub fn new(file_buffer: &'cryptor [u8]) -> Self {
-        Self { file_buffer }
+        Self { input_file: file_buffer }
     }
 
     pub fn encrypt_contraption(&self) -> Vec<u8> {
         let (key, iv) = self.rfc2898_derive_bytes(CONTRAPTION_PASSWORD);
-        let cipher_buffer = self.aes_encrypt(&key, &iv, self.file_buffer);
+        let cipher_buffer = self.aes_encrypt(&key, &iv, self.input_file);
         cipher_buffer
     }
 
     pub fn decrypt_contraption(&self) -> Result<Vec<u8>, CryptorError> {
         let (key, iv) = self.rfc2898_derive_bytes(CONTRAPTION_PASSWORD);
-        let plain_buffer = self.aes_decrypt(&key, &iv, self.file_buffer)?;
+        let plain_buffer = self.aes_decrypt(&key, &iv, self.input_file)?;
         Ok(plain_buffer)
     }
 
     pub fn encrypt_progress(&self) -> Vec<u8> {
         let (key, iv) = self.rfc2898_derive_bytes(PROGRESS_PASSWORD);
-        let cipher_buffer = self.aes_encrypt(&key, &iv, self.file_buffer);
+        let cipher_buffer = self.aes_encrypt(&key, &iv, self.input_file);
         let sha1_buffer = self.sha1_hash(&cipher_buffer);
         [sha1_buffer, cipher_buffer].concat()
     }
 
     pub fn decrypt_progress(&self) -> Result<Vec<u8>, CryptorError> {
-        let (sha1_slice, cipher_slice) = match self.file_buffer.len() >= 20 {
-            true => self.file_buffer.split_at(20),
+        let (sha1_slice, cipher_slice) = match self.input_file.len() >= 20 {
+            true => self.input_file.split_at(20),
             false => {
                 return Err(CryptorError::Sha1HashError(
                     "SHA-1 contents too short".to_owned(),
