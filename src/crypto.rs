@@ -41,22 +41,22 @@ impl<'cryptor> Cryptor<'cryptor> {
     }
 
     pub fn decrypt_progress(&self) -> Result<Vec<u8>, CryptorError> {
-        let (sha1_slice, cipher_slice) = match self.input_file.len() >= 20 {
-            true => self.input_file.split_at(20),
-            false => {
-                return Err(CryptorError::Sha1HashError(
-                    "SHA-1 contents too short".to_owned(),
-                ));
-            }
+        let (sha1_slice, cipher_slice) = if self.input_file.len() >= 20 {
+            self.input_file.split_at(20)
+        } else {
+            return Err(CryptorError::Sha1HashError(
+                "SHA-1 contents too short".to_owned(),
+            ));
         };
-        let cipher_buffer: Vec<u8> = match sha1_slice == self.sha1_hash(cipher_slice) {
-            true => cipher_slice.to_owned(),
-            false => {
-                return Err(CryptorError::Sha1HashError(
-                    "SHA-1 checking failed".to_owned(),
-                ));
-            }
+
+        let cipher_buffer: Vec<u8> = if sha1_slice == self.sha1_hash(cipher_slice) {
+            cipher_slice.to_owned()
+        } else {
+            return Err(CryptorError::Sha1HashError(
+                "SHA-1 checking failed".to_owned(),
+            ));
         };
+        
         let (key, iv) = self.rfc2898_derive_bytes(PROGRESS_PASSWORD);
         let plain_buffer = self.aes_decrypt(&key, &iv, &cipher_buffer)?;
         Ok(plain_buffer)
