@@ -14,4 +14,4 @@ aes = { version = "0.8.4" }
 sha1 = { version = "0.10.6" }
 cbc = { version = "0.1.2", features = ["std"] }
 pbkdf2 = { version = "0.12.2", features = ["hmac"] }
-clap = { version = "4.5.3", features = ["derive", "help"] }
+clap = { version = "4.5.4", features = ["derive", "help"] }

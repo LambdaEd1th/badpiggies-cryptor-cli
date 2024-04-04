@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use clap::{Parser, ValueEnum};
 
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
-#[command(author, version, about, long_about = None, help_template = "{before-help}{about} by @{author-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}")]
+#[command(author, version, about, long_about = None)]
+#[command(help_template = "{before-help}{about} by @{author-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}")]
 pub struct Cli {
     /// What file type to run the program in
     #[arg(value_enum)]
