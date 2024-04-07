@@ -16,4 +16,4 @@ Cargo.lock
 # Others
 .cargo/
 .vscode/
-.DS_Store
+*/.DS_Store
