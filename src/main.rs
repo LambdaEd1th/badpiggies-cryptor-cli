@@ -1,7 +1,7 @@
 use std::{
     error::Error,
     fs::File,
-    io::{Read, Write},
+    io::{Read, Write}
 };
 
 mod crypto;
@@ -25,10 +25,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             let cryptor = Cryptor::new(&input_file_buffer);
             let output_buffer;
             match args.file_type {
-                cli::FileTypes::Progress => {
+                FileTypes::Progress => {
                     output_buffer = cryptor.encrypt_progress();
                 }
-                cli::FileTypes::Contraption => {
+                FileTypes::Contraption => {
                     output_buffer = cryptor.encrypt_contraption();
                 }
             }
@@ -54,15 +54,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             output_file.write_all(&output_buffer)?;
         }
         Commands::Generate(args) => {
-            let output_file;
-            match args.output_file {
-                Some(file_name) => {
-                    output_file = file_name;
-                }
-                None => {
-                    output_file = "./Progress.dat.xml".into();
-                }
-            }
+            let output_file = args.get_file();
             match Resource::get_example() {
                 Some(file) => {
                     let mut output_file = File::create(output_file)?;

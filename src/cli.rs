@@ -53,3 +53,12 @@ pub struct GenerateArgs {
     #[arg(value_name = "OUTPUT_FILE")]
     pub output_file: Option<PathBuf>,
 }
+
+impl GenerateArgs {
+    pub fn get_file(&self) -> PathBuf {
+        match &self.output_file {
+            Some(file_name) => file_name.to_path_buf(),
+            None => "./Progress.dat.xml".into(),
+        }
+    }
+}
