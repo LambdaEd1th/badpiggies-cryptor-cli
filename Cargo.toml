@@ -1,6 +1,6 @@
 [package]
 name = "badpiggies-cryptor-cli"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2021"
 authors = ["ed1th"]
 description = "Bad Piggies user data cryptor"
@@ -15,3 +15,4 @@ sha1 = { version = "0.10.6" }
 cbc = { version = "0.1.2", features = ["std"] }
 pbkdf2 = { version = "0.12.2", features = ["hmac"] }
 clap = { version = "4.5.4", features = ["derive", "help"] }
+rust-embed = { version = "8.4.0", features = ["compression"] }

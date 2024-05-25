@@ -21,6 +21,9 @@ pub enum Commands {
 
     /// Decrypt mode
     Decrypt(CryptoArgs),
+
+    /// Generate an example Progress.dat.xml
+    Generate(GenerateArgs),
 }
 
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
@@ -28,7 +31,7 @@ pub struct CryptoArgs {
     /// What file type to run the program in
     #[arg(value_enum)]
     pub file_type: FileTypes,
-    
+
     /// Input file
     #[arg(value_name = "INPUT_FILE")]
     pub input_file: PathBuf,
@@ -42,4 +45,11 @@ pub struct CryptoArgs {
 pub enum FileTypes {
     Progress,
     Contraption,
+}
+
+#[derive(Args, Clone, Debug, PartialEq, Eq)]
+pub struct GenerateArgs {
+    /// Output file
+    #[arg(value_name = "OUTPUT_FILE")]
+    pub output_file: Option<PathBuf>,
 }
