@@ -8,40 +8,49 @@ mod crypto;
 use crypto::Cryptor;
 
 mod cli;
-use cli::{Cli, CryptoModes, FileTypes};
+use cli::{Cli, Commands};
 
 use clap::Parser;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let mut input_file = File::open(cli.input_file)?;
-    let mut input_buffer: Vec<u8> = Vec::new();
-    input_file.read_to_end(&mut input_buffer)?;
-    let output_buffer: Vec<u8>;
-    let cryptor = Cryptor::new(&input_buffer);
-    match cli.file_type {
-        FileTypes::Progress => {
-            match cli.crypto_mode {
-                CryptoModes::Encrypt => {
+    match cli.command {
+        Commands::Encrypt(args) => {
+            let mut input_file = File::open(args.input_file)?;
+            let mut input_file_buffer: Vec<u8> = Vec::new();
+            input_file.read_to_end(&mut input_file_buffer)?;
+            let cryptor = Cryptor::new(&input_file_buffer);
+            let output_buffer;
+            match args.file_type {
+                cli::FileTypes::Progress => {
                     output_buffer = cryptor.encrypt_progress();
                 }
-                CryptoModes::Decrypt => {
-                    output_buffer = cryptor.decrypt_progress()?;
-                }
-            }
-        }
-        FileTypes::Contraption => {
-            match cli.crypto_mode {
-                CryptoModes::Encrypt => {
+                cli::FileTypes::Contraption => {
                     output_buffer = cryptor.encrypt_contraption();
                 }
-                CryptoModes::Decrypt => {
+            }
+            let mut output_file = File::create(args.output_file)?;
+            output_file.write_all(&output_buffer)?;
+        }
+        Commands::Decrypt(args) => {
+            let mut input_file = File::open(args.input_file)?;
+            let mut input_file_buffer: Vec<u8> = Vec::new();
+            input_file.read_to_end(&mut input_file_buffer)?;
+            let cryptor = Cryptor::new(&input_file_buffer);
+            let output_buffer;
+            match args.file_type {
+                cli::FileTypes::Progress => {
+                    output_buffer = cryptor.decrypt_progress()?;
+                }
+                cli::FileTypes::Contraption => {
                     output_buffer = cryptor.decrypt_contraption()?;
                 }
             }
+
+            let mut output_file = File::create(args.output_file)?;
+            output_file.write_all(&output_buffer)?;
         }
     }
-    let mut output_file = File::create(cli.output_file)?;
-    output_file.write_all(&output_buffer)?;
+    
     Ok(())
 }
