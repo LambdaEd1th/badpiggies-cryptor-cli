@@ -45,7 +45,7 @@ impl<'cryptor> Cryptor<'cryptor> {
             self.input_file.split_at(20)
         } else {
             return Err(CryptorError::Sha1HashError(
-                "SHA-1 contents too short".to_owned(),
+                "SHA-1 contents too short".to_string(),
             ));
         };
 
@@ -53,10 +53,10 @@ impl<'cryptor> Cryptor<'cryptor> {
             cipher_slice.to_owned()
         } else {
             return Err(CryptorError::Sha1HashError(
-                "SHA-1 checking failed".to_owned(),
+                "SHA-1 checking failed".to_string(),
             ));
         };
-        
+
         let (key, iv) = self.rfc2898_derive_bytes(PROGRESS_PASSWORD);
         let plain_buffer = self.aes_decrypt(&key, &iv, &cipher_buffer)?;
         Ok(plain_buffer)

@@ -50,6 +50,7 @@ pub enum FileTypes {
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
 pub struct GenerateArgs {
     /// Output file
+    /// (Default: Progress.dat.xml on the current folder)
     #[arg(value_name = "OUTPUT_FILE")]
     pub output_file: Option<PathBuf>,
 }
