@@ -2,12 +2,12 @@ use std::path::PathBuf;
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
 
+const HELP_TEMPLATE: &str = "{before-help}{about} by @{author-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}";
+
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
 #[command(author, version, about, long_about = None)]
 #[command(next_line_help = true)]
-#[command(
-    help_template = "{before-help}{about} by @{author-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}"
-)]
+#[command(help_template = HELP_TEMPLATE)]
 pub struct Cli {
     /// What crypto mode to run the program in
     #[command(subcommand)]
