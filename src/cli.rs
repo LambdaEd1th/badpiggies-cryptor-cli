@@ -9,7 +9,7 @@ const HELP_TEMPLATE: &str = "{before-help}{about} by @{author-with-newline}\n{us
 #[command(next_line_help = true)]
 #[command(help_template = HELP_TEMPLATE)]
 pub struct Cli {
-    /// What crypto mode to run the program in
+    /// What mode to run the program in
     #[command(subcommand)]
     pub command: Commands,
 }
