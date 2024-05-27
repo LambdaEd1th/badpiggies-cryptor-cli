@@ -50,7 +50,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     output_buffer = cryptor.decrypt_contraption()?;
                 }
             }
-
             let mut output_file = File::create(args.output_file)?;
             output_file.write_all(&output_buffer)?;
         }
