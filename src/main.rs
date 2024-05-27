@@ -1,7 +1,7 @@
 use std::{
     error::Error,
     fs::File,
-    io::{Read, Write}
+    io::{Read, Write},
 };
 
 mod crypto;
@@ -17,6 +17,7 @@ use clap::Parser;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
+
     match cli.command {
         Commands::Encrypt(args) => {
             let mut input_file = File::open(args.input_file)?;
