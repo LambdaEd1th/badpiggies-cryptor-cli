@@ -7,6 +7,7 @@ description = "Bad Piggies user data cryptor"
 categories = ["command-line-utilities"]
 readme = "README.md"
 license = "GPL-3.0-or-later"
+repository = "https://github.com/LambdaEd1th/badpiggies-cryptor-cli"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
