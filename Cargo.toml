@@ -12,8 +12,8 @@ repository = "https://github.com/LambdaEd1th/badpiggies-cryptor-cli"
 
 [dependencies]
 aes = { version = "0.8.4" }
-sha1 = { version = "0.10.6" }
+sha1 = { version = "0.10.1" }
 cbc = { version = "0.1.2", features = ["std"] }
 pbkdf2 = { version = "0.12.2", features = ["hmac"] }
-clap = { version = "4.5.7", features = ["derive", "help"] }
-rust-embed = { version = "8.4.0", features = ["compression"] }
+clap = { version = "4.5.16", features = ["derive", "help"] }
+rust-embed = { version = "8.5.0", features = ["compression"] }
