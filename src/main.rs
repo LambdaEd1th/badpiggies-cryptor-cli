@@ -55,15 +55,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         Commands::Generate(args) => {
             let output_file = args.get_file();
-            match Resource::get_example() {
-                Some(file) => {
-                    let mut output_file = File::create(output_file)?;
-                    output_file.write_all(&file)?;
-                }
-                None => {
-                    eprintln!("Cannot create example file.")
-                }
-            }
+            let mut output_file = File::create(output_file)?;
+            output_file.write_all(&Resource::get_example())?;
         }
     }
 
