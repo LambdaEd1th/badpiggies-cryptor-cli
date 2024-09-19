@@ -16,9 +16,7 @@ use resource::Resource;
 use clap::Parser;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let cli = Cli::parse();
-
-    match cli.command {
+    match Cli::parse().command {
         Commands::Encrypt(args) => {
             let mut input_file = File::open(args.input_file)?;
             let mut input_file_buffer: Vec<u8> = Vec::new();
