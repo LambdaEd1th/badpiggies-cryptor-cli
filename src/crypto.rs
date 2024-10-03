@@ -103,7 +103,7 @@ impl std::fmt::Display for Error {
         match &self {
             Self::Sha1HashLengthError(len) => write!(f, "Sha1HashLengthError: {len}"),
             Self::Sha1HashCheckError(sha1_slice, sha1_hash) => {
-                write!(f, "Sha1HashCheckError: {sha1_slice:?} {sha1_hash:?}")
+                write!(f, "Sha1HashCheckError: {sha1_slice:#X?} {sha1_hash:#X?}")
             }
             Self::AesCryptoError(err) => write!(f, "AesCryptoError: {err}"),
         }
