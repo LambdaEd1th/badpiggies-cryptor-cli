@@ -59,7 +59,7 @@ impl GenerateArgs {
     pub fn get_file(&self) -> PathBuf {
         match &self.output_file {
             Some(file_name) => file_name.to_path_buf(),
-            None => "./Progress.dat.xml".into(),
+            None => PathBuf::from("./Progress.dat.xml"),
         }
     }
 }

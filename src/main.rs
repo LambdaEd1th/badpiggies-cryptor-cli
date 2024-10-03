@@ -1,5 +1,4 @@
 use std::{
-    error::Error,
     fs::File,
     io::{Read, Write},
 };
@@ -15,7 +14,7 @@ use resource::Resource;
 
 use clap::Parser;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Error> {
     let cli = Cli::parse();
 
     match cli.command {
@@ -55,10 +54,55 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         Commands::Generate(args) => {
             let output_file = args.get_file();
-            let mut output_file = File::create(output_file)?;
-            output_file.write_all(&Resource::get_example())?;
+            match Resource::get("Example.xml") {
+                Some(embedded_file) => {
+                    let mut output_file = File::create(output_file)?;
+                    output_file.write_all(&embedded_file.data)?;
+                }
+                None => return Err(Error::ResourceError),
+            }
         }
     }
 
     Ok(())
+}
+
+#[derive(Debug)]
+pub enum Error {
+    // Failed hash error
+    CryptorError(crypto::Error),
+    IOError(std::io::Error),
+    ResourceError,
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Self::CryptorError(err) => write!(f, "CryptorError: {err}"),
+            Self::IOError(err) => write!(f, "IOError: {err}"),
+            Self::ResourceError => write!(f, "ResourceError"),
+        }
+    }
+}
+
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match &self {
+            Self::CryptorError(err) => Some(err),
+            Self::IOError(err) => Some(err),
+            Self::ResourceError => None,
+        }
+    }
+}
+
+impl From<crypto::Error> for Error {
+    fn from(err: crypto::Error) -> Self {
+        Self::CryptorError(err)
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(err: std::io::Error) -> Self {
+        Self::IOError(err)
+    }
 }
