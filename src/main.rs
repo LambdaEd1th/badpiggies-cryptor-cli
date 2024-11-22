@@ -69,7 +69,6 @@ fn main() -> Result<(), Error> {
 
 #[derive(Debug)]
 pub enum Error {
-    // Failed hash error
     CryptorError(crypto::Error),
     IOError(std::io::Error),
     ResourceError,
