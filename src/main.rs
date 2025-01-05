@@ -22,14 +22,14 @@ fn main() -> Result<(), Error> {
             let mut input_file = File::open(args.input_file)?;
             let mut input_file_buffer = Vec::<u8>::new();
             input_file.read_to_end(&mut input_file_buffer)?;
-            let cryptor = Cryptor::new(&input_file_buffer);
+            let cryptor = Cryptor::new();
             let output_buffer;
             match args.file_type {
                 FileTypes::Progress => {
-                    output_buffer = cryptor.encrypt_progress();
+                    output_buffer = cryptor.encrypt_progress(&input_file_buffer);
                 }
                 FileTypes::Contraption => {
-                    output_buffer = cryptor.encrypt_contraption();
+                    output_buffer = cryptor.encrypt_contraption(&input_file_buffer);
                 }
             }
             let mut output_file = File::create(args.output_file)?;
@@ -39,14 +39,14 @@ fn main() -> Result<(), Error> {
             let mut input_file = File::open(args.input_file)?;
             let mut input_file_buffer = Vec::<u8>::new();
             input_file.read_to_end(&mut input_file_buffer)?;
-            let cryptor = Cryptor::new(&input_file_buffer);
+            let cryptor = Cryptor::new();
             let output_buffer;
             match args.file_type {
                 FileTypes::Progress => {
-                    output_buffer = cryptor.decrypt_progress()?;
+                    output_buffer = cryptor.decrypt_progress(&input_file_buffer)?;
                 }
                 FileTypes::Contraption => {
-                    output_buffer = cryptor.decrypt_contraption()?;
+                    output_buffer = cryptor.decrypt_contraption(&input_file_buffer)?;
                 }
             }
             let mut output_file = File::create(args.output_file)?;

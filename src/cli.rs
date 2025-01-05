@@ -41,6 +41,7 @@ pub struct CryptoArgs {
     pub output_file: PathBuf,
 }
 
+#[repr(isize)]
 #[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
 pub enum FileTypes {
     Progress,

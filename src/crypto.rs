@@ -16,39 +16,37 @@ const PROGRESS_PASSWORD: &[u8] = b"56SA%FG42Dv5#4aG67f2";
 const CONTRAPTION_PASSWORD: &[u8] = b"3b91A049Ca7HvSjhxT35";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Cryptor<'cryptor> {
-    input_file: &'cryptor [u8],
-}
+pub struct Cryptor {}
 
-impl<'cryptor> Cryptor<'cryptor> {
+impl Cryptor {
     /// Creates a new [`Cryptor`].
-    pub fn new(input_file: &'cryptor [u8]) -> Self {
-        Self { input_file }
+    pub fn new() -> Self {
+        Self {}
     }
 
-    pub fn encrypt_contraption(&self) -> Vec<u8> {
+    pub fn encrypt_contraption(&self, buffer: &[u8]) -> Vec<u8> {
         let (key, iv) = self.rfc2898_derive_bytes(CONTRAPTION_PASSWORD);
-        let cipher_buffer = self.aes_encrypt(&key, &iv, self.input_file);
+        let cipher_buffer = self.aes_encrypt(&key, &iv, buffer);
         cipher_buffer
     }
 
-    pub fn decrypt_contraption(&self) -> Result<Vec<u8>> {
+    pub fn decrypt_contraption(&self, buffer: &[u8]) -> Result<Vec<u8>> {
         let (key, iv) = self.rfc2898_derive_bytes(CONTRAPTION_PASSWORD);
-        let plain_buffer = self.aes_decrypt(&key, &iv, self.input_file)?;
+        let plain_buffer = self.aes_decrypt(&key, &iv, buffer)?;
         Ok(plain_buffer)
     }
 
-    pub fn encrypt_progress(&self) -> Vec<u8> {
+    pub fn encrypt_progress(&self, buffer: &[u8]) -> Vec<u8> {
         let (key, iv) = self.rfc2898_derive_bytes(PROGRESS_PASSWORD);
-        let cipher_buffer = self.aes_encrypt(&key, &iv, self.input_file);
+        let cipher_buffer = self.aes_encrypt(&key, &iv, buffer);
         let sha1_buffer = self.sha1_hash(&cipher_buffer);
         [sha1_buffer, cipher_buffer].concat()
     }
 
-    pub fn decrypt_progress(&self) -> Result<Vec<u8>> {
-        let input_file_len = self.input_file.len();
+    pub fn decrypt_progress(&self, buffer: &[u8]) -> Result<Vec<u8>> {
+        let input_file_len = buffer.len();
         let (sha1_slice, cipher_slice) = if input_file_len >= 20 {
-            self.input_file.split_at(20)
+            buffer.split_at(20)
         } else {
             return Err(Error::Sha1HashLengthError(input_file_len));
         };
