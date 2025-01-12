@@ -16,7 +16,7 @@ const PROGRESS_PASSWORD: &[u8] = b"56SA%FG42Dv5#4aG67f2";
 const CONTRAPTION_PASSWORD: &[u8] = b"3b91A049Ca7HvSjhxT35";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Cryptor {}
+pub struct Cryptor;
 
 impl Cryptor {
     /// Creates a new [`Cryptor`].
