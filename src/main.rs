@@ -1,65 +1,45 @@
 use std::{
     fs::File,
-    io::{Read, Write},
+    io::{Read, Write}, path::PathBuf,
 };
-
-mod crypto;
+use clap::Parser;
 use crypto::Cryptor;
-
-mod cli;
+use resource::Resource;
 use cli::{Cli, Commands, FileTypes};
 
+mod crypto;
 mod resource;
-use resource::Resource;
+mod cli;
 
-use clap::Parser;
+type Result<T> = std::result::Result<T, Error>;
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<()> {
     let cli = Cli::parse();
+    let cryptor = Cryptor::new();
 
     match cli.command {
         Commands::Encrypt(args) => {
-            let mut input_file = File::open(args.input_file)?;
-            let mut input_file_buffer = Vec::<u8>::new();
-            input_file.read_to_end(&mut input_file_buffer)?;
-            let cryptor = Cryptor::new();
-            let output_buffer;
-            match args.file_type {
-                FileTypes::Progress => {
-                    output_buffer = cryptor.encrypt_progress(&input_file_buffer);
-                }
-                FileTypes::Contraption => {
-                    output_buffer = cryptor.encrypt_contraption(&input_file_buffer);
-                }
-            }
-            let mut output_file = File::create(args.output_file)?;
-            output_file.write_all(&output_buffer)?;
+            let data = read_file(&args.input_file)?;
+            let output = match args.file_type {
+                FileTypes::Progress => cryptor.encrypt_progress(&data),
+                FileTypes::Contraption => cryptor.encrypt_contraption(&data),
+            };
+            write_file(&args.output_file, &output)?;
         }
-        Commands::Decrypt(args) => {
-            let mut input_file = File::open(args.input_file)?;
-            let mut input_file_buffer = Vec::<u8>::new();
-            input_file.read_to_end(&mut input_file_buffer)?;
-            let cryptor = Cryptor::new();
-            let output_buffer;
-            match args.file_type {
-                FileTypes::Progress => {
-                    output_buffer = cryptor.decrypt_progress(&input_file_buffer)?;
-                }
-                FileTypes::Contraption => {
-                    output_buffer = cryptor.decrypt_contraption(&input_file_buffer)?;
-                }
-            }
-            let mut output_file = File::create(args.output_file)?;
-            output_file.write_all(&output_buffer)?;
+        cli::Commands::Decrypt(args) => {
+            let data = read_file(&args.input_file)?;
+            let output = match args.file_type {
+                FileTypes::Progress => cryptor.decrypt_progress(&data)?,
+                FileTypes::Contraption => cryptor.decrypt_contraption(&data)?,
+            };
+            write_file(&args.output_file, &output)?;
         }
-        Commands::Generate(args) => {
-            let output_file = args.get_file();
-            match Resource::get("Example.xml") {
-                Some(embedded_file) => {
-                    let mut output_file = File::create(output_file)?;
-                    output_file.write_all(&embedded_file.data)?;
-                }
-                None => return Err(Error::ResourceError),
+        cli::Commands::Generate(args) => {
+            let output_path = args.get_file();
+            if let Some(embedded) = Resource::get("Example.xml") {
+                write_file(&output_path, &embedded.data)?;
+            } else {
+                return Err(Error::Resource);
             }
         }
     }
@@ -67,41 +47,25 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(Debug)]
-pub enum Error {
-    CryptorError(crypto::Error),
-    IOError(std::io::Error),
-    ResourceError,
+fn read_file(path: &PathBuf) -> Result<Vec<u8>> {
+    let mut file = std::fs::File::open(path)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    Ok(buffer)
 }
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self {
-            Self::CryptorError(err) => write!(f, "CryptorError: {err}"),
-            Self::IOError(err) => write!(f, "IOError: {err}"),
-            Self::ResourceError => write!(f, "ResourceError"),
-        }
-    }
+fn write_file(path: &PathBuf, data: &[u8]) -> Result<()> {
+    let mut file = File::create(path)?;
+    file.write_all(data)?;
+    Ok(())
 }
 
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match &self {
-            Self::CryptorError(err) => Some(err),
-            Self::IOError(err) => Some(err),
-            Self::ResourceError => None,
-        }
-    }
-}
-
-impl From<crypto::Error> for Error {
-    fn from(err: crypto::Error) -> Self {
-        Self::CryptorError(err)
-    }
-}
-
-impl From<std::io::Error> for Error {
-    fn from(err: std::io::Error) -> Self {
-        Self::IOError(err)
-    }
+#[derive(Debug, thiserror::Error)]
+enum Error {
+    #[error(transparent)]
+    Crypto(#[from] crypto::Error),
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    #[error("Resource not found")]
+    Resource,
 }
