@@ -39,7 +39,7 @@ fn main() -> Result<()> {
             if let Some(embedded) = Resource::get("Example.xml") {
                 write_file(&output_path, &embedded.data)?;
             } else {
-                return Err(Error::Resource);
+                return Err(Error::ResourceError);
             }
         }
     }
@@ -63,9 +63,9 @@ fn write_file(path: &PathBuf, data: &[u8]) -> Result<()> {
 #[derive(Debug, thiserror::Error)]
 enum Error {
     #[error(transparent)]
-    Crypto(#[from] crypto::Error),
+    CryptoError(#[from] crypto::Error),
     #[error(transparent)]
-    Io(#[from] std::io::Error),
+    IoError(#[from] std::io::Error),
     #[error("Resource not found")]
-    Resource,
+    ResourceError,
 }
