@@ -41,7 +41,7 @@ impl Cryptor {
     }
 
     pub fn decrypt_progress(&self, buffer: &[u8]) -> Result<Vec<u8>> {
-        // 手动检查长度
+        // Check if the buffer is at least 20 bytes long for SHA1 hash
         if buffer.len() < 20 {
             return Err(Error::Sha1HashLengthError(buffer.len()));
         }
