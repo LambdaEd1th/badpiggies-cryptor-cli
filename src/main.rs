@@ -1,15 +1,16 @@
-use std::{
-    fs::File,
-    io::{Read, Write}, path::PathBuf,
-};
 use clap::Parser;
+use cli::{Cli, Commands, FileTypes};
 use crypto::Cryptor;
 use resource::Resource;
-use cli::{Cli, Commands, FileTypes};
+use std::{
+    fs::File,
+    io::{Read, Write},
+    path::PathBuf,
+};
 
+mod cli;
 mod crypto;
 mod resource;
-mod cli;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -36,11 +37,7 @@ fn main() -> Result<()> {
         }
         cli::Commands::Generate(args) => {
             let output_path = args.get_file();
-            if let Some(embedded) = Resource::get("Example.xml") {
-                write_file(&output_path, &embedded.data)?;
-            } else {
-                return Err(Error::ResourceError);
-            }
+            write_file(&output_path, &Resource::get("Example.xml").unwrap().data)?;
         }
     }
 
@@ -66,6 +63,4 @@ enum Error {
     CryptoError(#[from] crypto::Error),
     #[error(transparent)]
     IoError(#[from] std::io::Error),
-    #[error("Resource not found")]
-    ResourceError,
 }
