@@ -83,6 +83,6 @@ pub enum Error {
     Sha1HashLengthError(usize),
     #[error("SHA1 hash mismatch (expected {0:x?}, got {1:x?})")]
     Sha1HashCheckError(Vec<u8>, Vec<u8>),
-    #[error("AES cryption error: {0}")]
+    #[error("AES crypto error: {0}")]
     AesCryptoError(#[from] UnpadError),
 }
