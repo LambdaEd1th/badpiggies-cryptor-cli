@@ -36,20 +36,25 @@ impl Cryptor {
     pub fn encrypt_progress(&self, buffer: &[u8]) -> Vec<u8> {
         let (key, iv) = self.derive_key_iv(PROGRESS_PASSWORD);
         let cipher_buffer = self.aes_encrypt(&key, &iv, buffer);
-        let sha1_buffer = self.sha1_hash(&cipher_buffer);
+        let sha1_buffer = self.sha1_checksum(&cipher_buffer);
         [sha1_buffer, cipher_buffer].concat()
     }
 
     pub fn decrypt_progress(&self, buffer: &[u8]) -> Result<Vec<u8>> {
-        // Check if the buffer is at least 20 bytes long for SHA1 hash
+        // Ensure the buffer is at least 20 bytes to contain the SHA1 hash
         if buffer.len() < 20 {
             return Err(Error::Sha1HashLengthError(buffer.len()));
         }
         let (sha1_slice, cipher_slice) = buffer.split_at(20);
 
-        let sha1_hash = self.sha1_hash(cipher_slice);
-        if sha1_slice != sha1_hash {
-            return Err(Error::Sha1HashCheckError(sha1_slice.to_vec(), sha1_hash));
+        let got_checksum = self.sha1_checksum(cipher_slice);
+        let expected_checksum = sha1_slice.to_vec();
+
+        if expected_checksum != got_checksum {
+            return Err(Error::Sha1ChecksumError(
+                expected_checksum,
+                got_checksum,
+            ));
         }
 
         let (key, iv) = self.derive_key_iv(PROGRESS_PASSWORD);
@@ -64,7 +69,7 @@ impl Cryptor {
         Ok(Aes256CbcDec::new(key.into(), iv.into()).decrypt_padded_vec_mut::<Pkcs7>(buffer)?)
     }
 
-    fn sha1_hash(&self, buffer: &[u8]) -> Vec<u8> {
+    fn sha1_checksum(&self, buffer: &[u8]) -> Vec<u8> {
         Sha1::new_with_prefix(buffer).finalize().to_vec()
     }
 
@@ -79,10 +84,33 @@ impl Cryptor {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Invalid SHA1 hash length: {0}")]
+    #[error("SHA1 hash length error: expected 20 bytes, got {0}")]
     Sha1HashLengthError(usize),
-    #[error("SHA1 hash mismatch (expected {0:x?}, got {1:x?})")]
-    Sha1HashCheckError(Vec<u8>, Vec<u8>),
-    #[error("AES crypto error: {0}")]
-    AesCryptoError(#[from] UnpadError),
+    #[error("SHA1 checksum mismatch: expected {0:?}, got {1:?}")]
+    Sha1ChecksumError(Vec<u8>, Vec<u8>),
+    #[error("AES encryption/decryption error: {0}")]
+    CbcPaddingError(#[from] UnpadError),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_encrypt_decrypt_contraption() {
+        let cryptor = Cryptor::new();
+        let data = b"Test contraption data";
+        let encrypted = cryptor.encrypt_contraption(data);
+        let decrypted = cryptor.decrypt_contraption(&encrypted).unwrap();
+        assert_eq!(data, &decrypted[..]);
+    }
+
+    #[test]
+    fn test_encrypt_decrypt_progress() {
+        let cryptor = Cryptor::new();
+        let data = b"Test progress data";
+        let encrypted = cryptor.encrypt_progress(data);
+        let decrypted = cryptor.decrypt_progress(&encrypted).unwrap();
+        assert_eq!(data, &decrypted[..]);
+    }
 }

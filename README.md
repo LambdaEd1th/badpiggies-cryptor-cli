@@ -1,7 +1,7 @@
 # Bad Piggies Cryptor
 
 * Author: ed1th
-* Version: 0.5.1
+* Version: 0.5.2
 
 ## Description
 Bad Piggies user data cryptor<br>
@@ -12,6 +12,6 @@ Encrypt or decrypt Progress.dat and .contraption file
 
 ### Example
 #### Decrypt Progress.dat file
-`badpiggies-cryptor-cli progress decrypt Progress.dat Progress.dat.xml`
+`badpiggies-cryptor-cli decrypt -i Progress.dat -o Progress.dat.xml progress`
 #### Encrypt .contraption file
-`badpiggies-cryptor-cli contraption encrypt example.contraption.xml example.contraption`
+`badpiggies-cryptor-cli encrypt -i example.contraption.xml -o example.contraption contraption`
