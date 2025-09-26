@@ -1,6 +1,6 @@
 [package]
 name = "badpiggies-cryptor-cli"
-version = "0.5.2"
+version = "0.5.3"
 edition = "2021"
 authors = ["ed1th"]
 description = "Bad Piggies user data cryptor"
