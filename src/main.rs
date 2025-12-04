@@ -4,11 +4,9 @@ use std::fs;
 
 mod cli;
 mod crypto;
-mod resource;
 
 use cli::{Cli, Commands, FileTypes};
 use crypto::Cryptor;
-use resource::Resource;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -47,10 +45,9 @@ fn main() -> Result<()> {
         Commands::Generate(args) => {
             let output_path = args.get_file();
 
-            let example_file = Resource::get("Example.xml")
-                .context("Internal error: Embedded Example.xml resource not found")?;
+            const EXAMPLE_XML: &[u8] = include_bytes!("../tests/example.xml");
 
-            fs::write(&output_path, example_file.data)
+            fs::write(&output_path, EXAMPLE_XML)
                 .with_context(|| format!("Unable to generate sample file: {:?}", output_path))?;
 
             println!("Sample file has been generated: {:?}", output_path);
