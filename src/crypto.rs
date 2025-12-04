@@ -37,14 +37,14 @@ pub fn encrypt_progress(buffer: &[u8]) -> Vec<u8> {
 
 pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
     if buffer.len() < 20 {
-        return Err(Error::Sha1HashLengthError(buffer.len()));
+        return Err(Error::Sha1HashLength(buffer.len()));
     }
     let (expected_checksum, cipher_slice) = buffer.split_at(20);
 
     let got_checksum = sha1_checksum(cipher_slice);
 
     if expected_checksum != got_checksum.as_slice() {
-        return Err(Error::Sha1ChecksumError(
+        return Err(Error::Sha1Checksum(
             expected_checksum.to_vec(),
             got_checksum,
         ));
@@ -81,13 +81,13 @@ fn derive_key_iv(password: &[u8]) -> ([u8; 32], [u8; 16]) {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Data too short: expected at least 20 bytes, got {0}")]
-    Sha1HashLengthError(usize),
+    Sha1HashLength(usize),
 
     #[error("Checksum mismatch: expected {0:?}, got {1:?}")]
-    Sha1ChecksumError(Vec<u8>, Vec<u8>),
+    Sha1Checksum(Vec<u8>, Vec<u8>),
 
     #[error("AES decryption/padding error: {0}")]
-    CbcPaddingError(#[from] UnpadError),
+    CbcPadding(#[from] UnpadError),
 }
 
 // --- Tests ---
@@ -118,7 +118,7 @@ mod tests {
         encrypted[0] = encrypted[0].wrapping_add(1); // Corrupt the data
         assert!(matches!(
             decrypt_progress(&encrypted),
-            Err(Error::Sha1ChecksumError(_, _))
+            Err(Error::Sha1Checksum(_, _))
         ));
     }
 }
