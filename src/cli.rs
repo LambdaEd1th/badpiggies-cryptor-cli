@@ -1,6 +1,6 @@
 // cli.rs
-use std::path::PathBuf;
 use clap::{Args, Parser, Subcommand, ValueEnum};
+use std::path::PathBuf;
 
 const HELP_TEMPLATE: &str = "{before-help}{about} by @{author-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}";
 
