@@ -1,6 +1,6 @@
 use aes::cipher::{
-    block_padding::{Pkcs7, UnpadError},
     BlockDecryptMut, BlockEncryptMut, KeyIvInit,
+    block_padding::{Pkcs7, UnpadError},
 };
 use sha1::{Digest, Sha1};
 
@@ -31,7 +31,7 @@ pub fn encrypt_progress(buffer: &[u8]) -> Vec<u8> {
     let (key, iv) = derive_key_iv(PROGRESS_PASSWORD);
     let cipher_buffer = aes_encrypt(&key, &iv, buffer);
     let sha1_buffer = sha1_checksum(&cipher_buffer);
-    
+
     [sha1_buffer, cipher_buffer].concat()
 }
 
@@ -61,8 +61,7 @@ fn aes_encrypt(key: &[u8], iv: &[u8], buffer: &[u8]) -> Vec<u8> {
 }
 
 fn aes_decrypt(key: &[u8], iv: &[u8], buffer: &[u8]) -> CryptoResult<Vec<u8>> {
-    Ok(Aes256CbcDec::new(key.into(), iv.into())
-        .decrypt_padded_vec_mut::<Pkcs7>(buffer)?)
+    Ok(Aes256CbcDec::new(key.into(), iv.into()).decrypt_padded_vec_mut::<Pkcs7>(buffer)?)
 }
 
 fn sha1_checksum(buffer: &[u8]) -> Vec<u8> {
@@ -83,10 +82,10 @@ fn derive_key_iv(password: &[u8]) -> ([u8; 32], [u8; 16]) {
 pub enum Error {
     #[error("Data too short: expected at least 20 bytes, got {0}")]
     Sha1HashLengthError(usize),
-    
+
     #[error("Checksum mismatch: expected {0:?}, got {1:?}")]
     Sha1ChecksumError(Vec<u8>, Vec<u8>),
-    
+
     #[error("AES decryption/padding error: {0}")]
     CbcPaddingError(#[from] UnpadError),
 }
@@ -111,12 +110,15 @@ mod tests {
         let decrypted = decrypt_progress(&encrypted).unwrap();
         assert_eq!(data, &decrypted[..]);
     }
-    
+
     #[test]
     fn test_decrypt_bad_checksum() {
         let data = b"Data";
         let mut encrypted = encrypt_progress(data);
         encrypted[0] = encrypted[0].wrapping_add(1); // Corrupt the data
-        assert!(matches!(decrypt_progress(&encrypted), Err(Error::Sha1ChecksumError(_, _))));
+        assert!(matches!(
+            decrypt_progress(&encrypted),
+            Err(Error::Sha1ChecksumError(_, _))
+        ));
     }
 }
