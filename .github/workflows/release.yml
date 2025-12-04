@@ -9,6 +9,7 @@ on:
       - "v*"
 
 env:
+  # TODO: Replace with your actual binary name as defined in Cargo.toml
   BIN_NAME: badpiggies-cryptor-cli
 
 jobs:
@@ -24,8 +25,9 @@ jobs:
             target: x86_64-unknown-linux-gnu
             use_cross: false
             suffix: ""
-          
+
           # --- Linux AArch64 (ARM64) ---
+          # Uses 'cross' because standard GitHub runners are x86_64
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             use_cross: true
@@ -38,6 +40,7 @@ jobs:
             suffix: ".exe"
 
           # --- Windows AArch64 (ARM64) ---
+          # Windows ARM64 can be compiled natively on x64 runners via MSVC
           - os: windows-latest
             target: aarch64-pc-windows-msvc
             use_cross: false
@@ -68,6 +71,8 @@ jobs:
         uses: taiki-e/install-action@cross
 
       - name: Build Release Binary
+        # Use bash on all platforms to ensure consistent script syntax
+        shell: bash
         run: |
           CMD=cargo
           if [[ "${{ matrix.use_cross }}" == "true" ]]; then
@@ -75,23 +80,42 @@ jobs:
           fi
           $CMD build --release --target ${{ matrix.target }}
 
-      - name: Prepare Release Asset
-        id: prepare
+      - name: Package Release Asset
+        id: package
         shell: bash
         run: |
-          SRC_PATH="target/${{ matrix.target }}/release/${{ env.BIN_NAME }}${{ matrix.suffix }}"
-          ASSET_NAME="${{ env.BIN_NAME }}-${{ github.ref_name }}-${{ matrix.target }}${{ matrix.suffix }}"
-          
-          if [ ! -f "$SRC_PATH" ]; then
-              echo "Error: Binary not found at $SRC_PATH"
+          # 1. Setup variables
+          # The folder name inside the archive: project-version-platform
+          RELEASE_NAME="${{ env.BIN_NAME }}-${{ github.ref_name }}-${{ matrix.target }}"
+          ARCHIVE_NAME="${RELEASE_NAME}.tar.gz"
+
+          # Path to the compiled binary
+          BIN_PATH="target/${{ matrix.target }}/release/${{ env.BIN_NAME }}${{ matrix.suffix }}"
+
+          # 2. Verify existence of the binary
+          if [ ! -f "$BIN_PATH" ]; then
+              echo "Error: Binary not found at $BIN_PATH"
               exit 1
           fi
 
-          mv "$SRC_PATH" "$ASSET_NAME"
-          echo "asset_path=$ASSET_NAME" >> $GITHUB_OUTPUT
+          # 3. Create a temporary directory for packaging
+          # This ensures the user extracts a directory rather than loose files
+          mkdir "$RELEASE_NAME"
+
+          # 4. Copy the binary and documentation files
+          cp "$BIN_PATH" "$RELEASE_NAME/"
+          if [ -f "README.md" ]; then cp "README.md" "$RELEASE_NAME/"; fi
+          if [ -f "LICENSE" ]; then cp "LICENSE" "$RELEASE_NAME/"; fi
+
+          # 5. Create the .tar.gz archive
+          # -c: create, -z: gzip, -v: verbose, -f: file
+          tar -czvf "$ARCHIVE_NAME" "$RELEASE_NAME"
+
+          # 6. Set the output for the next step
+          echo "asset_path=$ARCHIVE_NAME" >> $GITHUB_OUTPUT
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ${{ steps.prepare.outputs.asset_path }}
+          files: ${{ steps.package.outputs.asset_path }}
