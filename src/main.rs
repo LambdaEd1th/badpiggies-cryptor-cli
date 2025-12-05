@@ -42,12 +42,12 @@ fn main() -> Result<()> {
         Commands::Generate(args) => {
             let output_path = args.get_file();
 
-            const EXAMPLE_XML: &[u8] = include_bytes!("../tests/example.xml");
+            const SAMPLE_XML: &[u8] = include_bytes!("../tests/sample.xml");
 
-            fs::write(&output_path, EXAMPLE_XML)
-                .with_context(|| format!("Failed to generate example file: {:?}", output_path))?;
+            fs::write(&output_path, SAMPLE_XML)
+                .with_context(|| format!("Failed to generate sample file: {:?}", output_path))?;
 
-            println!("✅ Example file generated: {:?}", output_path);
+            println!("✅ Sample file generated: {:?}", output_path);
         }
     }
 

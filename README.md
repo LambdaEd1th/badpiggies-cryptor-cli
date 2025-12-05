@@ -76,7 +76,7 @@ badpiggies-cryptor-cli decrypt -i my_vehicle.contraption -o my_vehicle.xml contr
 
 ### 4\. Generating a Template
 
-Create a default example XML file in the current directory.
+Create a default sample XML file in the current directory.
 
 ```bash
 badpiggies-cryptor-cli generate
