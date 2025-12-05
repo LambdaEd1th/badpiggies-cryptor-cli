@@ -29,10 +29,12 @@ pub fn decrypt_contraption(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
 
 pub fn encrypt_progress(buffer: &[u8]) -> Vec<u8> {
     let (key, iv) = derive_key_iv(PROGRESS_PASSWORD);
-    let cipher_buffer = aes_encrypt(&key, &iv, buffer);
+    let mut cipher_buffer = aes_encrypt(&key, &iv, buffer);
     let sha1_buffer = sha1_checksum(&cipher_buffer);
-
-    [sha1_buffer, cipher_buffer].concat()
+    
+    let mut final_data = sha1_buffer;
+    final_data.append(&mut cipher_buffer);
+    final_data
 }
 
 pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
