@@ -2,12 +2,14 @@
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-const HELP_TEMPLATE: &str = "{before-help}{about} by @{author-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}";
-
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
-#[command(author, version, about, long_about = None)]
-#[command(next_line_help = true)]
-#[command(help_template = HELP_TEMPLATE)]
+#[command(
+    name = "badpiggies-cryptor-cli",
+    author = "ed1th",
+    version,
+    about = "Bad Piggies user data cryptor",
+    long_about = "A command-line tool to encrypt and decrypt Bad Piggies game data files (Progress.dat and .contraption)."
+)]
 pub struct Cli {
     /// What mode to run the program in
     #[command(subcommand)]
