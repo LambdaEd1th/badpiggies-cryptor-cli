@@ -97,6 +97,3 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 -----
 
 *Disclaimer: This tool is an unofficial utility and is not affiliated with or endorsed by Rovio Entertainment. Use it at your own risk. Always backup your save files before modification.*
-
-```
-```
