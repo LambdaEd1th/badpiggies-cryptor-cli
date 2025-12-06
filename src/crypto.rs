@@ -32,7 +32,7 @@ pub fn decrypt_contraption(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
 pub fn encrypt_progress(buffer: &[u8]) -> Vec<u8> {
     let (key, iv) = derive_key_iv(secrets::PROGRESS_PWD);
     let mut cipher_buffer = aes_encrypt(&key, &iv, buffer);
-    
+
     let mut final_data = sha1_checksum(&cipher_buffer);
     final_data.append(&mut cipher_buffer);
     final_data
@@ -42,7 +42,7 @@ pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
     if buffer.len() < 20 {
         return Err(Error::Sha1HashLength(buffer.len()));
     }
-    
+
     let (expected_checksum, cipher_slice) = buffer.split_at(20);
     let got_checksum = sha1_checksum(cipher_slice);
 
@@ -60,8 +60,7 @@ pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
 // --- Internal Helpers ---
 
 fn aes_encrypt(key: &[u8], iv: &[u8], buffer: &[u8]) -> Vec<u8> {
-    Aes256CbcEnc::new(key.into(), iv.into())
-        .encrypt_padded_vec_mut::<Pkcs7>(buffer)
+    Aes256CbcEnc::new(key.into(), iv.into()).encrypt_padded_vec_mut::<Pkcs7>(buffer)
 }
 
 fn aes_decrypt(key: &[u8], iv: &[u8], buffer: &[u8]) -> CryptoResult<Vec<u8>> {
@@ -77,10 +76,10 @@ fn sha1_checksum(buffer: &[u8]) -> Vec<u8> {
 fn derive_key_iv(password: &[u8]) -> ([u8; 32], [u8; 16]) {
     let bytes = pbkdf2::pbkdf2_hmac_array::<Sha1, 48>(password, secrets::SALT, 1000);
     let (key, iv) = bytes.split_at(32);
-    
+
     (
-        key.try_into().expect("Slice length must match"), 
-        iv.try_into().expect("Slice length must match")
+        key.try_into().expect("Slice length must match"),
+        iv.try_into().expect("Slice length must match"),
     )
 }
 
@@ -90,7 +89,9 @@ pub enum Error {
     #[error("Data too short: expected at least 20 bytes (hash header), got {0}")]
     Sha1HashLength(usize),
 
-    #[error("Checksum mismatch: file may be corrupted or modified.\nExpected: {0:x?}\nCalculated: {1:x?}")]
+    #[error(
+        "Checksum mismatch: file may be corrupted or modified.\nExpected: {0:x?}\nCalculated: {1:x?}"
+    )]
     Sha1Checksum(Vec<u8>, Vec<u8>),
 
     #[error("AES decryption/padding error: {0}")]
