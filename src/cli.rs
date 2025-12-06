@@ -1,6 +1,6 @@
 // cli.rs
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use std::path::PathBuf;
+use std::path::PathBuf; // 解决未使用的导入警告，移除了 Path
 
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
 #[command(
@@ -36,7 +36,7 @@ pub struct CryptoArgs {
     pub input_file: PathBuf,
     /// Output file for the encrypted or decrypted data
     #[arg(short, long, value_name = "OUTPUT_FILE")]
-    pub output_file: PathBuf,
+    pub output_file: Option<PathBuf>,
 }
 
 /// Enum representing the types of files that can be processed
@@ -60,5 +60,45 @@ impl GenerateArgs {
         self.output_file
             .clone()
             .unwrap_or_else(|| PathBuf::from("./Progress.dat.xml"))
+    }
+}
+
+impl CryptoArgs {
+    /// Returns the final output file path. If not provided, generates a default name like 'input_file_decrypted.ext'.
+    pub fn get_output_file(&self, is_encrypt: bool) -> PathBuf {
+        if let Some(path) = &self.output_file {
+            return path.clone();
+        }
+
+        let suffix = if is_encrypt {
+            "_encrypted"
+        } else {
+            "_decrypted"
+        };
+
+        let input_path = &self.input_file;
+        let mut output_path = input_path.to_path_buf();
+
+        if let Some(ext) = output_path.extension() {
+            let stem = output_path.file_stem().unwrap_or_default();
+            let new_file_name = format!(
+                "{}{}{}",
+                stem.to_string_lossy(),
+                suffix,
+                &format!(".{}", ext.to_string_lossy())
+            );
+
+            output_path.set_file_name(new_file_name);
+        } else {
+            let original_name = input_path
+                .file_name()
+                .map(|f| f.to_os_string())
+                .unwrap_or_else(|| "output".into());
+
+            let new_file_name = format!("{}{}", original_name.to_string_lossy(), suffix);
+            output_path.set_file_name(new_file_name);
+        }
+
+        output_path
     }
 }
