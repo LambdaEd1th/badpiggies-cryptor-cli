@@ -4,10 +4,6 @@ A fast, cross-platform command-line utility built with Rust for managing (encryp
 
 This tool enables users to modify game progress (`Progress.dat`) and facilitate the sharing or editing of vehicle blueprints (`.contraption`) by reliably converting files between the game's encrypted binary format and a human-readable XML format.
 
-## Author
-
-* **ed1th**
-
 ## Features
 
 * **Decrypt Game Progress**: Convert the encrypted `Progress.dat` file into editable XML format.
