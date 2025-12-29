@@ -18,3 +18,5 @@ cbc = { version = "0.1.2", features = ["std"] }
 pbkdf2 = { version = "0.12.2", features = ["hmac"] }
 clap = { version = "4.5.53", features = ["derive", "help"] }
 anyhow = "1.0.100"
+log = "0.4.29"
+env_logger = "0.11.8"

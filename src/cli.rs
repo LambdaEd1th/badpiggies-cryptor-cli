@@ -1,6 +1,6 @@
 // cli.rs
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use std::path::PathBuf; // 解决未使用的导入警告，移除了 Path
+use std::path::PathBuf;
 
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
 #[command(
@@ -14,6 +14,14 @@ pub struct Cli {
     /// What mode to run the program in
     #[command(subcommand)]
     pub command: Commands,
+
+    /// Enable verbose logging (Debug level)
+    #[arg(short, long, global = true)]
+    pub verbose: bool,
+
+    /// Suppress all output except errors
+    #[arg(short, long, global = true, conflicts_with = "verbose")]
+    pub quiet: bool,
 }
 
 #[derive(Subcommand, Clone, Debug, PartialEq, Eq)]
