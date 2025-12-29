@@ -1,13 +1,12 @@
+// src/main.rs
 use anyhow::{Context, Result};
 use clap::Parser;
 use env_logger::Builder;
 use log::{LevelFilter, debug, info};
 use std::fs;
 
-mod cli;
-mod crypto;
-
-use cli::{Cli, Commands, CryptoArgs, FileTypes, GenerateArgs};
+use badpiggies_cryptor_cli::cli::{Cli, Commands, CryptoArgs, FileTypes, GenerateArgs};
+use badpiggies_cryptor_cli::crypto;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -50,6 +49,7 @@ fn process_crypto(args: CryptoArgs, is_encrypt: bool) -> Result<()> {
 
     debug!("Processing data (size: {} bytes)", data.len());
     let result_data = match (&args.file_type, is_encrypt) {
+        // crypto module is now imported from the library
         (&FileTypes::Progress, true) => crypto::encrypt_progress(&data),
         (&FileTypes::Progress, false) => crypto::decrypt_progress(&data)?,
         (&FileTypes::Contraption, true) => crypto::encrypt_contraption(&data),
