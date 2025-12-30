@@ -30,8 +30,8 @@ pub enum Commands {
     Encrypt(CryptoArgs),
     /// Decrypt mode
     Decrypt(CryptoArgs),
-    /// Generate an example Progress.dat.xml file
-    Generate(GenerateArgs),
+    /// Initialize a sample Progress.dat.xml file
+    InitSample(InitSampleArgs),
 }
 
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
@@ -56,13 +56,13 @@ pub enum FileTypes {
 
 /// Arguments for the Generate command to create an example Progress.dat.xml file
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
-pub struct GenerateArgs {
+pub struct InitSampleArgs {
     /// Output file (Default: Progress.dat.xml on the current folder)
     #[arg(value_name = "OUTPUT_FILE")]
     pub output_file: Option<PathBuf>,
 }
 
-impl GenerateArgs {
+impl InitSampleArgs {
     /// Returns the output file path, defaulting to "Progress.dat.xml" in the current directory if not specified
     pub fn get_file(&self) -> PathBuf {
         self.output_file

@@ -6,7 +6,7 @@ use std::fs;
 
 // Import the decoupled logic from lib.rs
 use badpiggies_cryptor_cli::{
-    cli::{Cli, Commands, CryptoArgs, GenerateArgs},
+    cli::{Cli, Commands, CryptoArgs, InitSampleArgs},
     process_data,
 };
 
@@ -19,7 +19,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Encrypt(args) => run_crypto_task(args, true)?,
         Commands::Decrypt(args) => run_crypto_task(args, false)?,
-        Commands::Generate(args) => generate_sample(args)?,
+        Commands::InitSample(args) => generate_sample(args)?,
     }
 
     debug!("Program finished successfully");
@@ -57,7 +57,7 @@ fn run_crypto_task(args: CryptoArgs, is_encrypt: bool) -> Result<()> {
 }
 
 /// Generates a sample XML file for testing or new saves.
-fn generate_sample(args: GenerateArgs) -> Result<()> {
+fn generate_sample(args: InitSampleArgs) -> Result<()> {
     let output_path = args.get_file();
 
     // Embed the sample file into the binary
