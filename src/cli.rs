@@ -1,4 +1,3 @@
-// cli.rs
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
@@ -54,21 +53,12 @@ pub enum FileTypes {
     Contraption,
 }
 
-/// Arguments for the Generate command to create an example Progress.dat.xml file
+/// Arguments for the Generate command to create a sample Progress.dat.xml file
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
 pub struct InitSampleArgs {
-    /// Output file (Default: Progress.dat.xml on the current folder)
-    #[arg(value_name = "OUTPUT_FILE")]
-    pub output_file: Option<PathBuf>,
-}
-
-impl InitSampleArgs {
-    /// Returns the output file path, defaulting to "Progress.dat.xml" in the current directory if not specified
-    pub fn get_file(&self) -> PathBuf {
-        self.output_file
-            .clone()
-            .unwrap_or_else(|| PathBuf::from("./Progress.dat.xml"))
-    }
+    /// Output file
+    #[arg(default_value = "Progress.dat.xml")]
+    pub output_file: PathBuf,
 }
 
 impl CryptoArgs {

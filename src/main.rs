@@ -4,7 +4,6 @@ use env_logger::Builder;
 use log::{LevelFilter, debug, info};
 use std::fs;
 
-// Import the decoupled logic from lib.rs
 use badpiggies_cryptor_cli::{
     cli::{Cli, Commands, CryptoArgs, InitSampleArgs},
     process_data,
@@ -58,7 +57,7 @@ fn run_crypto_task(args: CryptoArgs, is_encrypt: bool) -> Result<()> {
 
 /// Generates a sample XML file for testing or new saves.
 fn generate_sample(args: InitSampleArgs) -> Result<()> {
-    let output_path = args.get_file();
+    let output_path = args.output_file;
 
     // Embed the sample file into the binary
     const SAMPLE_XML: &[u8] = include_bytes!("../tests/sample.xml");
