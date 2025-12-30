@@ -57,7 +57,7 @@ pub enum FileTypes {
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
 pub struct InitSampleArgs {
     /// Output file
-    #[arg(default_value = "Progress.dat.xml")]
+    #[arg(short, long, default_value = "Progress.dat.xml")]
     pub output_file: PathBuf,
 }
 
