@@ -1,5 +1,9 @@
 use clap::{Args, Parser, Subcommand, ValueEnum};
+use env_logger::Builder;
+use log::LevelFilter;
 use std::path::PathBuf;
+
+use crate::mode::CryptoMode;
 
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
 #[command(
@@ -35,20 +39,20 @@ pub enum Commands {
 
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
 pub struct CryptoArgs {
-    /// Type of file to encrypt or decrypt
+    /// Category of file to encrypt or decrypt
     #[arg(value_enum)]
-    pub file_type: FileTypes,
+    pub category: Categories,
     /// Input file to encrypt or decrypt
     #[arg(short, long, value_name = "INPUT_FILE")]
-    pub input_file: PathBuf,
+    pub input: PathBuf,
     /// Output file for the encrypted or decrypted data
     #[arg(short, long, value_name = "OUTPUT_FILE")]
-    pub output_file: Option<PathBuf>,
+    pub output: Option<PathBuf>,
 }
 
 /// Enum representing the types of files that can be processed
 #[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
-pub enum FileTypes {
+pub enum Categories {
     Progress,
     Contraption,
 }
@@ -58,23 +62,44 @@ pub enum FileTypes {
 pub struct InitSampleArgs {
     /// Output file
     #[arg(short, long, default_value = "Progress.dat.xml")]
-    pub output_file: PathBuf,
+    pub output: PathBuf,
+}
+
+impl Cli {
+    /// Initializes the logging system based on CLI flags or environment variables.
+    pub fn init_logger(&self) {
+        let mut builder = Builder::from_default_env();
+
+        if self.verbose {
+            // -v: Show Debug information
+            builder.filter_level(LevelFilter::Debug);
+        } else if self.quiet {
+            // -q: Only show Errors, suppress Info
+            builder.filter_level(LevelFilter::Error);
+        } else {
+            // Default: If RUST_LOG env var is not set, default to Info
+            if std::env::var("RUST_LOG").is_err() {
+                builder.filter_level(LevelFilter::Info);
+            }
+        }
+
+        builder.init();
+    }
 }
 
 impl CryptoArgs {
     /// Returns the final output file path. If not provided, generates a default name like 'input_file_decrypted.ext'.
-    pub fn get_output_file(&self, is_encrypt: bool) -> PathBuf {
-        if let Some(path) = &self.output_file {
+    pub fn get_output_file(&self, mode: CryptoMode) -> PathBuf {
+        if let Some(path) = &self.output {
             return path.clone();
         }
 
-        let suffix = if is_encrypt {
-            "_encrypted"
-        } else {
-            "_decrypted"
+        let suffix = match mode {
+            CryptoMode::Encrypt => "_encrypted",
+            CryptoMode::Decrypt => "_decrypted",
         };
 
-        let input_path = &self.input_file;
+        let input_path = &self.input;
         let mut output_path = input_path.to_path_buf();
 
         if let Some(ext) = output_path.extension() {
