@@ -6,13 +6,7 @@ use std::path::PathBuf;
 use crate::mode::CryptoMode;
 
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
-#[command(
-    name = "badpiggies-cryptor-cli",
-    author = "ed1th",
-    version,
-    about = "Bad Piggies user data cryptor",
-    long_about = "A command-line tool to encrypt and decrypt Bad Piggies game data files (Progress.dat and .contraption)."
-)]
+#[command(author, version, about, long_about = None)]
 pub struct Cli {
     /// What mode to run the program in
     #[command(subcommand)]
