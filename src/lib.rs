@@ -22,11 +22,11 @@ use crate::mode::CryptoMode;
 pub fn process_data(category: &Categories, mode: CryptoMode, data: &[u8]) -> Result<Vec<u8>> {
     match (category, mode) {
         // Progress.dat: Uses AES + SHA1 Checksum
-        (Categories::Progress, CryptoMode::Encrypt) => Ok(crypto::encrypt_progress(data)),
+        (Categories::Progress, CryptoMode::Encrypt) => Ok(crypto::encrypt_progress(data)?),
         (Categories::Progress, CryptoMode::Decrypt) => Ok(crypto::decrypt_progress(data)?),
 
         // .contraption: Uses AES only
-        (Categories::Contraption, CryptoMode::Encrypt) => Ok(crypto::encrypt_contraption(data)),
+        (Categories::Contraption, CryptoMode::Encrypt) => Ok(crypto::encrypt_contraption(data)?),
         (Categories::Contraption, CryptoMode::Decrypt) => Ok(crypto::decrypt_contraption(data)?),
     }
 }

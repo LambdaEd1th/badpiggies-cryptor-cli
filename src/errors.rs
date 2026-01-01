@@ -1,4 +1,5 @@
 use aes::cipher::block_padding::UnpadError;
+use std::array::TryFromSliceError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -13,4 +14,7 @@ pub enum Error {
 
     #[error("AES decryption/padding error: {0}")]
     CbcPadding(#[from] UnpadError),
+
+    #[error("Internal error during key/IV derivation: {0}")]
+    KeyDerivation(#[from] TryFromSliceError),
 }

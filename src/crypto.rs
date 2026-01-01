@@ -10,24 +10,24 @@ pub type CryptoResult<T> = core::result::Result<T, Error>;
 
 // --- Public API ---
 
-pub fn encrypt_contraption(buffer: &[u8]) -> Vec<u8> {
-    let (key, iv) = derive_key_iv(constants::CONTRAPTION_PWD);
-    aes_encrypt(&key, &iv, buffer)
+pub fn encrypt_contraption(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
+    let (key, iv) = derive_key_iv(constants::CONTRAPTION_PWD)?;
+    Ok(aes_encrypt(&key, &iv, buffer))
 }
 
 pub fn decrypt_contraption(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
-    let (key, iv) = derive_key_iv(constants::CONTRAPTION_PWD);
+    let (key, iv) = derive_key_iv(constants::CONTRAPTION_PWD)?;
     aes_decrypt(&key, &iv, buffer)
 }
 
-pub fn encrypt_progress(buffer: &[u8]) -> Vec<u8> {
-    let (key, iv) = derive_key_iv(constants::PROGRESS_PWD);
+pub fn encrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
+    let (key, iv) = derive_key_iv(constants::PROGRESS_PWD)?;
     let mut cipher_buffer = aes_encrypt(&key, &iv, buffer);
 
     // Calculate checksum and prepend it to the data
     let mut final_data = sha1_checksum(&cipher_buffer);
     final_data.append(&mut cipher_buffer);
-    final_data
+    Ok(final_data)
 }
 
 pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
@@ -48,7 +48,7 @@ pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
         ));
     }
 
-    let (key, iv) = derive_key_iv(constants::PROGRESS_PWD);
+    let (key, iv) = derive_key_iv(constants::PROGRESS_PWD)?;
     aes_decrypt(&key, &iv, cipher_slice)
 }
 
@@ -68,7 +68,9 @@ fn sha1_checksum(buffer: &[u8]) -> Vec<u8> {
     Sha1::new_with_prefix(buffer).finalize().to_vec()
 }
 
-fn derive_key_iv(password: &[u8]) -> ([u8; constants::KEY_LEN], [u8; constants::IV_LEN]) {
+fn derive_key_iv(
+    password: &[u8],
+) -> CryptoResult<([u8; constants::KEY_LEN], [u8; constants::IV_LEN])> {
     // Generate enough bytes for both Key and IV using PBKDF2
     let bytes = pbkdf2::pbkdf2_hmac_array::<Sha1, { constants::DERIVED_LEN }>(
         password,
@@ -78,30 +80,32 @@ fn derive_key_iv(password: &[u8]) -> ([u8; constants::KEY_LEN], [u8; constants::
 
     let (key, iv) = bytes.split_at(constants::KEY_LEN);
 
-    (
-        key.try_into().expect("Slice length must match KEY_LEN"),
-        iv.try_into().expect("Slice length must match IV_LEN"),
-    )
+    Ok((key.try_into()?, iv.try_into()?))
 }
 
 // --- Tests ---
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_contraption_cycle() {
+    fn test_contraption_cycle() -> CryptoResult<()> {
         let original = b"Test Vehicle Blueprint";
-        let encrypted = encrypt_contraption(original);
-        let decrypted = decrypt_contraption(&encrypted).expect("Decryption failed");
+        let encrypted = encrypt_contraption(original)?;
+        let decrypted = decrypt_contraption(&encrypted)?;
+
         assert_eq!(original, &decrypted[..]);
+        Ok(())
     }
 
     #[test]
-    fn test_progress_cycle() {
+    fn test_progress_cycle() -> CryptoResult<()> {
         let original = b"Test Game Save Progress";
-        let encrypted = encrypt_progress(original);
-        let decrypted = decrypt_progress(&encrypted).expect("Decryption failed");
+        let encrypted = encrypt_progress(original)?;
+        let decrypted = decrypt_progress(&encrypted)?;
+
         assert_eq!(original, &decrypted[..]);
+        Ok(())
     }
 }
