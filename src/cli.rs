@@ -27,8 +27,8 @@ pub enum Commands {
     Encrypt(CryptoArgs),
     /// Decrypt mode
     Decrypt(CryptoArgs),
-    /// Initialize a sample Progress.dat.xml file
-    InitSample(InitSampleArgs),
+    /// Generate a template Progress.dat.xml file
+    Generate(GenerateArgs),
 }
 
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
@@ -51,9 +51,9 @@ pub enum Categories {
     Contraption,
 }
 
-/// Arguments for the Generate command to create a sample Progress.dat.xml file
+/// Arguments for the Generate command to create a template Progress.dat.xml file
 #[derive(Args, Clone, Debug, PartialEq, Eq)]
-pub struct InitSampleArgs {
+pub struct GenerateArgs {
     /// Output file
     #[arg(short, long, default_value = "Progress.dat.xml")]
     pub output: PathBuf,

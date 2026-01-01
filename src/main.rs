@@ -4,7 +4,7 @@ use log::{debug, info};
 use std::fs;
 
 use badpiggies_cryptor_cli::{
-    cli::{Cli, Commands, CryptoArgs, InitSampleArgs},
+    cli::{Cli, Commands, CryptoArgs, GenerateArgs},
     constants::SAMPLE_XML,
     mode::CryptoMode,
     process_data,
@@ -19,7 +19,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Encrypt(args) => run_crypto_task(args, CryptoMode::Encrypt)?,
         Commands::Decrypt(args) => run_crypto_task(args, CryptoMode::Decrypt)?,
-        Commands::InitSample(args) => generate_sample(args)?,
+        Commands::Generate(args) => generate_sample(args)?,
     }
 
     debug!("Program finished successfully");
@@ -56,7 +56,7 @@ fn run_crypto_task(args: CryptoArgs, mode: CryptoMode) -> Result<()> {
 }
 
 /// Generates a sample XML file for testing or new saves.
-fn generate_sample(args: InitSampleArgs) -> Result<()> {
+fn generate_sample(args: GenerateArgs) -> Result<()> {
     let output_path = args.output;
 
     debug!("Generating sample file at: {:?}", output_path);

@@ -48,8 +48,8 @@ badpiggies-cryptor-cli <COMMAND> [OPTIONS]
 
 | Argument | Description |
 | :--- | :--- |
-| `-i, --input-file <PATH>` | The source file path for processing. |
-| `-o, --output-file <PATH>` | The destination path for the result (optional). |
+| `-i, --input <PATH>` | The source file path for processing. |
+| `-o, --output <PATH>` | The destination path for the result (optional). |
 | `<FILE_TYPE>` | The file format being processed. Must be either `progress` or `contraption`. |
 
 ### File Types
