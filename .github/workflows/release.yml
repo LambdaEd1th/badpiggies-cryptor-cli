@@ -9,7 +9,7 @@ on:
       - "v*"
 
 env:
-  # TODO: Replace with your actual binary name as defined in Cargo.toml
+  # The binary name as defined in Cargo.toml
   BIN_NAME: badpiggies-cryptor-cli
 
 jobs:
@@ -27,7 +27,6 @@ jobs:
             suffix: ""
 
           # --- Linux AArch64 (ARM64) ---
-          # Uses 'cross' because standard GitHub runners are x86_64
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             use_cross: true
@@ -40,7 +39,6 @@ jobs:
             suffix: ".exe"
 
           # --- Windows AArch64 (ARM64) ---
-          # Windows ARM64 can be compiled natively on x64 runners via MSVC
           - os: windows-latest
             target: aarch64-pc-windows-msvc
             use_cross: false
@@ -71,7 +69,6 @@ jobs:
         uses: taiki-e/install-action@cross
 
       - name: Build Release Binary
-        # Use bash on all platforms to ensure consistent script syntax
         shell: bash
         run: |
           CMD=cargo
@@ -85,7 +82,6 @@ jobs:
         shell: bash
         run: |
           # 1. Setup variables
-          # The folder name inside the archive: project-version-platform
           RELEASE_NAME="${{ env.BIN_NAME }}-${{ github.ref_name }}-${{ matrix.target }}"
           ARCHIVE_NAME="${RELEASE_NAME}.tar.gz"
 
@@ -99,7 +95,6 @@ jobs:
           fi
 
           # 3. Create a temporary directory for packaging
-          # This ensures the user extracts a directory rather than loose files
           mkdir "$RELEASE_NAME"
 
           # 4. Copy the binary and documentation files
@@ -107,11 +102,27 @@ jobs:
           if [ -f "README.md" ]; then cp "README.md" "$RELEASE_NAME/"; fi
           if [ -f "LICENSE" ]; then cp "LICENSE" "$RELEASE_NAME/"; fi
 
-          # 5. Create the .tar.gz archive
-          # -c: create, -z: gzip, -v: verbose, -f: file
+          # 5. Copy platform-specific scripts (New Section)
+          # Logic: Check the OS runner type to decide which script to include
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+              # Windows: Include PowerShell script
+              if [ -f "scripts/batch.ps1" ]; then 
+                  cp "scripts/batch.ps1" "$RELEASE_NAME/"
+                  echo "Included scripts/batch.ps1 for Windows"
+              fi
+          else
+              # Linux/macOS: Include Shell script and make executable
+              if [ -f "scripts/batch.sh" ]; then 
+                  cp "scripts/batch.sh" "$RELEASE_NAME/"
+                  chmod +x "$RELEASE_NAME/batch.sh"
+                  echo "Included scripts/batch.sh for Unix"
+              fi
+          fi
+
+          # 6. Create the .tar.gz archive
           tar -czvf "$ARCHIVE_NAME" "$RELEASE_NAME"
 
-          # 6. Set the output for the next step
+          # 7. Set the output for the next step
           echo "asset_path=$ARCHIVE_NAME" >> $GITHUB_OUTPUT
 
       - name: Upload Release Asset
