@@ -96,24 +96,24 @@ impl CryptoArgs {
         let input_path = &self.input;
         let mut output_path = input_path.to_path_buf();
 
-        if let Some(ext) = output_path.extension() {
-            let stem = output_path.file_stem().unwrap_or_default();
-            let new_file_name = format!(
-                "{}{}{}",
-                stem.to_string_lossy(),
-                suffix,
-                &format!(".{}", ext.to_string_lossy())
-            );
+        // Get the filename as a string to manually manipulate string slices.
+        // This avoids potential ambiguity with Path::file_stem() in some edge cases.
+        let filename_cow = input_path
+            .file_name()
+            .map(|f| f.to_string_lossy())
+            .unwrap_or_default();
+        let filename = filename_cow.as_ref();
 
-            output_path.set_file_name(new_file_name);
+        // Find the last dot to insert the suffix correctly
+        if let Some(idx) = filename.rfind('.') {
+            // Split at the last dot: "Progress" | ".xml"
+            let (stem, ext) = filename.split_at(idx);
+            let new_name = format!("{}{}{}", stem, suffix, ext);
+            output_path.set_file_name(new_name);
         } else {
-            let original_name = input_path
-                .file_name()
-                .map(|f| f.to_os_string())
-                .unwrap_or_else(|| "output".into());
-
-            let new_file_name = format!("{}{}", original_name.to_string_lossy(), suffix);
-            output_path.set_file_name(new_file_name);
+            // No extension found, just append suffix to the end
+            let new_name = format!("{}{}", filename, suffix);
+            output_path.set_file_name(new_name);
         }
 
         output_path

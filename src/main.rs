@@ -5,7 +5,7 @@ use std::fs;
 
 use badpiggies_cryptor_cli::{
     cli::{Cli, Commands, CryptoArgs, GenerateArgs},
-    constants::SAMPLE_XML,
+    constants::TEMPLATE_XML,
     mode::CryptoMode,
     process_data,
 };
@@ -60,7 +60,7 @@ fn generate_sample(args: GenerateArgs) -> Result<()> {
     let output_path = args.output;
 
     debug!("Generating sample file at: {:?}", output_path);
-    fs::write(&output_path, SAMPLE_XML)
+    fs::write(&output_path, TEMPLATE_XML)
         .with_context(|| format!("Failed to generate sample file: {:?}", output_path))?;
 
     info!("✅ Sample file generated: {:?}", output_path);

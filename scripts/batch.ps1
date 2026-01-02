@@ -26,14 +26,14 @@ foreach ($path in $PathsToCheck) {
     if (Test-Path $path) {
         $ToolPath = $path
         if ($path -like "*target*") {
-            Write-Host "ℹ️  Running in development mode (using target/release binary)" -ForegroundColor Gray
+            Write-Host "Running in development mode (using target/release binary)" -ForegroundColor Gray
         }
         break
     }
 }
 
 if ($null -eq $ToolPath) {
-    Write-Host "❌ Error: Could not find '$BinName'." -ForegroundColor Red
+    Write-Host "Error: Could not find '$BinName'." -ForegroundColor Red
     Write-Host "Please ensure the project is built or the binary is placed in the current directory."
     Write-Host "Press any key to exit..."
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
@@ -56,9 +56,9 @@ switch ($modeChoice) {
     "1" { $cmd = "decrypt" }
     "2" { $cmd = "encrypt" }
     "3" {
-        Write-Host "Generating sample file..." -ForegroundColor Yellow
+        Write-Host "Generating template file..." -ForegroundColor Yellow
         & $ToolPath generate
-        Write-Host "✅ Sample file generated successfully." -ForegroundColor Green
+        Write-Host "Template file generated successfully." -ForegroundColor Green
         Start-Sleep -Seconds 2
         exit
     }
@@ -74,7 +74,7 @@ $inputFile = Read-Host "Enter Input File Path (drag & drop allowed)"
 $inputFile = $inputFile -replace '"',''
 
 if (-not (Test-Path $inputFile)) {
-    Write-Host "❌ Error: File '$inputFile' does not exist." -ForegroundColor Red
+    Write-Host "Error: File '$inputFile' does not exist." -ForegroundColor Red
     exit
 }
 
@@ -114,13 +114,13 @@ try {
     & $ToolPath $argsList
     if ($LASTEXITCODE -eq 0) {
         Write-Host "------------------------------------------"
-        Write-Host "✅ Operation completed successfully!" -ForegroundColor Green
+        Write-Host "Operation completed successfully!" -ForegroundColor Green
     } else {
         throw "Exit code $LASTEXITCODE"
     }
 } catch {
     Write-Host "------------------------------------------"
-    Write-Host "❌ Operation failed. Please check the file or logs." -ForegroundColor Red
+    Write-Host "Operation failed. Please check the file or logs." -ForegroundColor Red
 }
 
 Write-Host "Press any key to exit..."

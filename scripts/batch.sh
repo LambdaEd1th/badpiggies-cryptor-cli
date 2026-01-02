@@ -18,9 +18,9 @@ if [ -f "./$BIN_NAME" ]; then
     TOOL="./$BIN_NAME"
 elif [ -f "../target/release/$BIN_NAME" ]; then
     TOOL="../target/release/$BIN_NAME"
-    echo "ℹ️  Running in development mode (using target/release binary)"
+    echo "Running in development mode (using target/release binary)"
 else
-    echo "❌ Error: Could not find '$BIN_NAME'."
+    echo "Error: Could not find '$BIN_NAME'."
     echo "Please ensure the project is built (cargo build --release) or the binary is in the current directory."
     exit 1
 fi
@@ -39,9 +39,9 @@ case $MODE_CHOICE in
     1) CMD="decrypt";;
     2) CMD="encrypt";;
     3)
-        echo "Generating sample file..."
+        echo "Generating template file..."
         $TOOL generate
-        echo "✅ Sample file generated successfully."
+        echo "Template file generated successfully."
         exit 0
         ;;
     *)
@@ -56,7 +56,7 @@ read -e -p "Enter Input File Path (drag & drop allowed): " INPUT_FILE
 INPUT_FILE=$(echo "$INPUT_FILE" | tr -d "'\"")
 
 if [ ! -f "$INPUT_FILE" ]; then
-    echo "❌ Error: File '$INPUT_FILE' does not exist."
+    echo "Error: File '$INPUT_FILE' does not exist."
     exit 1
 fi
 
@@ -96,8 +96,8 @@ $TOOL "${CMD_ARGS[@]}"
 # Check exit status
 if [ $? -eq 0 ]; then
     echo "------------------------------------------"
-    echo "✅ Operation completed successfully!"
+    echo "Operation completed successfully!"
 else
     echo "------------------------------------------"
-    echo "❌ Operation failed. Please check the file or logs."
+    echo "Operation failed. Please check the file or logs."
 fi
