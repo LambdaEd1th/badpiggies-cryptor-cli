@@ -19,7 +19,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Encrypt(args) => run_crypto_task(args, CryptoMode::Encrypt)?,
         Commands::Decrypt(args) => run_crypto_task(args, CryptoMode::Decrypt)?,
-        Commands::Generate(args) => generate_sample(args)?,
+        Commands::Generate(args) => generate_template(args)?,
     }
 
     debug!("Program finished successfully");
@@ -55,14 +55,14 @@ fn run_crypto_task(args: CryptoArgs, mode: CryptoMode) -> Result<()> {
     Ok(())
 }
 
-/// Generates a sample XML file for testing or new saves.
-fn generate_sample(args: GenerateArgs) -> Result<()> {
+/// Generates a template XML file for testing or new saves.
+fn generate_template(args: GenerateArgs) -> Result<()> {
     let output_path = args.output;
 
-    debug!("Generating sample file at: {:?}", output_path);
+    debug!("Generating template file at: {:?}", output_path);
     fs::write(&output_path, TEMPLATE_XML)
-        .with_context(|| format!("Failed to generate sample file: {:?}", output_path))?;
+        .with_context(|| format!("Failed to generate template file: {:?}", output_path))?;
 
-    info!("✅ Sample file generated: {:?}", output_path);
+    info!("✅ Template file generated: {:?}", output_path);
     Ok(())
 }
