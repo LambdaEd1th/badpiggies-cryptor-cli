@@ -10,7 +10,7 @@ use badpiggies_cryptor_core::{
 
 // Import local cli module
 mod cli;
-use cli::{Categories as CliCategories, Cli, Commands, CryptoArgs, GenerateArgs};
+use cli::{Cli, Commands, CryptoArgs, GenerateArgs};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -39,10 +39,7 @@ fn run_crypto_task(args: CryptoArgs, mode: CryptoMode) -> Result<()> {
 
     // 2. Logic Layer: Call the pure function in lib.rs
     // Map CLI category to Core category
-    let core_category = match args.category {
-        CliCategories::Progress => CoreCategories::Progress,
-        CliCategories::Contraption => CoreCategories::Contraption,
-    };
+    let core_category: CoreCategories = args.category.into();
 
     let result_data = process_data(&core_category, mode, &data)?;
 

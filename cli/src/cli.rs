@@ -45,7 +45,7 @@ pub struct CryptoArgs {
 }
 
 /// Enum representing the types of files that can be processed
-#[derive(ValueEnum, Clone, Debug, PartialEq, Eq)]
+#[derive(ValueEnum, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Categories {
     Progress,
     Contraption,
@@ -117,5 +117,14 @@ impl CryptoArgs {
         }
 
         output_path
+    }
+}
+
+impl From<Categories> for badpiggies_cryptor_core::Categories {
+    fn from(category: Categories) -> Self {
+        match category {
+            Categories::Progress => badpiggies_cryptor_core::Categories::Progress,
+            Categories::Contraption => badpiggies_cryptor_core::Categories::Contraption,
+        }
     }
 }
