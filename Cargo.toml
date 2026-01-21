@@ -1,29 +1,4 @@
-[package]
-name = "badpiggies-cryptor-cli"
-version = "0.5.8"
-edition = "2024"
-authors = ["ed1th"]
-description = "Bad Piggies user data cryptor"
-categories = ["command-line-utilities"]
-readme = "README.md"
-license = "GPL-3.0-or-later"
-repository = "https://github.com/LambdaEd1th/badpiggies-cryptor-cli"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-thiserror = "2.0.17"
-aes = "0.8.4"
-sha1 = "0.10.6"
-cbc = { version = "0.1.2", features = ["std"] }
-pbkdf2 = { version = "0.12.2", features = ["hmac"] }
-clap = { version = "4.5.53", features = ["derive", "cargo"] }
-anyhow = "1.0.100"
-log = "0.4.29"
-env_logger = "0.11.8"
-
-[profile.release]
-strip = true
-opt-level = "s"
-lto = true
-codegen-units = 1
-panic = "abort"
+[workspace]
+members = ["core", "cli"]
+default-members = ["cli"]
+resolver = "2"

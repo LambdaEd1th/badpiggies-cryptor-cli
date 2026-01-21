@@ -3,12 +3,14 @@ use clap::Parser;
 use log::{debug, info};
 use std::fs;
 
-use badpiggies_cryptor_cli::{
-    cli::{Cli, Commands, CryptoArgs, GenerateArgs},
-    constants::TEMPLATE_XML,
-    mode::CryptoMode,
-    process_data,
+// Import core library
+use badpiggies_cryptor_core::{
+    constants::TEMPLATE_XML, mode::CryptoMode, process_data, Categories as CoreCategories,
 };
+
+// Import local cli module
+mod cli;
+use cli::{Categories as CliCategories, Cli, Commands, CryptoArgs, GenerateArgs};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -36,8 +38,13 @@ fn run_crypto_task(args: CryptoArgs, mode: CryptoMode) -> Result<()> {
     debug!("Processing data (size: {} bytes)", data.len());
 
     // 2. Logic Layer: Call the pure function in lib.rs
-    // This is now decoupled from the file system.
-    let result_data = process_data(&args.category, mode, &data)?;
+    // Map CLI category to Core category
+    let core_category = match args.category {
+        CliCategories::Progress => CoreCategories::Progress,
+        CliCategories::Contraption => CoreCategories::Contraption,
+    };
+
+    let result_data = process_data(&core_category, mode, &data)?;
 
     // 3. I/O Layer: Write output
     let output_path = args.get_output_file(mode);

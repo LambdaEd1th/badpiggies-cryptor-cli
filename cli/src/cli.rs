@@ -3,7 +3,7 @@ use env_logger::Builder;
 use log::LevelFilter;
 use std::path::PathBuf;
 
-use crate::mode::CryptoMode;
+use badpiggies_cryptor_core::mode::CryptoMode;
 
 #[derive(Parser, Clone, Debug, PartialEq, Eq)]
 #[command(author, version, about, long_about = None)]

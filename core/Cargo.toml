@@ -1,0 +1,12 @@
+[package]
+name = "badpiggies-cryptor-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror = "2.0.17"
+aes = "0.8.4"
+sha1 = "0.10.6"
+cbc = { version = "0.1.2", features = ["std"] }
+pbkdf2 = { version = "0.12.2", features = ["hmac"] }
+anyhow = "1.0.100"

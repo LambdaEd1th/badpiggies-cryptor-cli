@@ -1,4 +1,3 @@
-pub mod cli;
 pub mod constants;
 pub mod crypto;
 pub mod errors;
@@ -11,10 +10,14 @@ pub mod mode {
     }
 }
 
-use anyhow::Result;
-use cli::Categories;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Categories {
+    Progress,
+    Contraption,
+}
 
 use crate::mode::CryptoMode;
+use anyhow::Result;
 
 /// Core processing logic: dispatches to specific crypto functions based on configuration.
 /// Pure function: Input Bytes -> Output Bytes (or Error).

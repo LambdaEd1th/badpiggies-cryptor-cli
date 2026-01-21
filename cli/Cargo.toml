@@ -1,0 +1,11 @@
+[package]
+name = "badpiggies-cryptor-cli"
+version = "0.5.8"
+edition = "2021"
+
+[dependencies]
+badpiggies-cryptor-core = { path = "../core" }
+clap = { version = "4.5.53", features = ["derive", "cargo"] }
+anyhow = "1.0.100"
+log = "0.4.29"
+env_logger = "0.11.8"

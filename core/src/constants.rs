@@ -16,4 +16,4 @@ pub const SALT: &[u8] = &[
 pub const PROGRESS_PWD: &[u8] = b"56SA%FG42Dv5#4aG67f2";
 pub const CONTRAPTION_PWD: &[u8] = b"3b91A049Ca7HvSjhxT35";
 
-pub const TEMPLATE_XML: &[u8] = include_bytes!("../tests/template.xml");
+pub const TEMPLATE_XML: &[u8] = include_bytes!("../../tests/template.xml");
