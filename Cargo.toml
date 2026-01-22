@@ -2,3 +2,18 @@
 members = ["core", "cli"]
 default-members = ["cli"]
 resolver = "2"
+
+[workspace.package]
+edition = "2024"
+authors = ["Ed1th"]
+readme = "README.md"
+license = "GPL-3.0-or-later"
+
+# --- Release Profile Settings ---
+# These settings apply to the entire workspace when running with --release
+[profile.release]
+strip = true      # Strip symbols from binary to reduce size
+opt-level = "s"   # Optimize for size
+lto = true        # Enable Link Time Optimization
+codegen-units = 1 # Reduce parallelism for better optimization
+panic = "abort"   # Abort on panic instead of unwinding (smaller binary)

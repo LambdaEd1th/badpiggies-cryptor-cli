@@ -1,7 +1,8 @@
 [package]
 name = "badpiggies-cryptor-cli"
 version = "0.5.8"
-edition = "2021"
+edition = { workspace = true }
+authors = { workspace = true }
 
 [dependencies]
 badpiggies-cryptor-core = { path = "../core" }

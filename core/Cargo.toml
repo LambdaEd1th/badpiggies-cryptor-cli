@@ -1,7 +1,8 @@
 [package]
 name = "badpiggies-cryptor-core"
 version = "0.1.0"
-edition = "2021"
+edition = { workspace = true }
+authors = { workspace = true }
 
 [dependencies]
 thiserror = "2.0.17"
