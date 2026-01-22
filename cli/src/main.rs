@@ -5,7 +5,7 @@ use std::fs;
 
 // Import core library
 use badpiggies_cryptor_core::{
-    constants::TEMPLATE_XML, mode::CryptoMode, process_data, Categories as CoreCategories,
+    Categories as CoreCategories, constants::TEMPLATE_XML, mode::CryptoMode, process_data,
 };
 
 // Import local cli module
