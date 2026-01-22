@@ -21,10 +21,10 @@ Pre-compiled executables for various platforms are available on the [Releases pa
 If you have the [Rust toolchain](https://www.rust-lang.org/tools/install) installed, you can build the project yourself:
 
 ```bash
-git clone [https://github.com/LambdaEd1th/badpiggies-cryptor-cli.git](https://github.com/LambdaEd1th/badpiggies-cryptor-cli.git)
+git clone https://github.com/LambdaEd1th/badpiggies-cryptor-cli.git
 cd badpiggies-cryptor-cli
 cargo build --release
-````
+```
 
 The compiled executable will be located in the `target/release/` directory.
 
@@ -40,8 +40,8 @@ badpiggies-cryptor-cli <COMMAND> [OPTIONS]
 
 | Command | Description |
 | :--- | :--- |
-| `decrypt` | Decrypts a binary file (Binary -\> XML). |
-| `encrypt` | Encrypts a source file (XML -\> Binary). |
+| `decrypt` | Decrypts a binary file (Binary -> XML). |
+| `encrypt` | Encrypts a source file (XML -> Binary). |
 | `generate` | Generates a sample `Progress.dat.xml` file. |
 
 ### Arguments
@@ -109,7 +109,7 @@ The tool accurately implements the custom encryption scheme used by Bad Piggies:
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](https://www.google.com/search?q=LICENSE) file for the full text.
+This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for the full text.
 
 -----
 
