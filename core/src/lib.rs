@@ -17,12 +17,15 @@ pub enum Categories {
 }
 
 use crate::mode::CryptoMode;
-use anyhow::Result;
 
 /// Core processing logic: dispatches to specific crypto functions based on configuration.
 /// Pure function: Input Bytes -> Output Bytes (or Error).
 /// Does NOT handle file I/O.
-pub fn process_data(category: &Categories, mode: CryptoMode, data: &[u8]) -> Result<Vec<u8>> {
+pub fn process_data(
+    category: &Categories,
+    mode: CryptoMode,
+    data: &[u8],
+) -> Result<Vec<u8>, errors::Error> {
     match (category, mode) {
         // Progress.dat: Uses AES + SHA1 Checksum
         (Categories::Progress, CryptoMode::Encrypt) => Ok(crypto::encrypt_progress(data)?),

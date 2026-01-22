@@ -92,7 +92,6 @@ name = "badpiggies-cryptor-core"
 version = "0.1.0"
 dependencies = [
  "aes",
- "anyhow",
  "cbc",
  "pbkdf2",
  "sha1",
