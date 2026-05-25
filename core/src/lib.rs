@@ -14,6 +14,7 @@ pub mod mode {
 pub enum Categories {
     Progress,
     Contraption,
+    Achievements,
 }
 
 use crate::mode::CryptoMode;
@@ -34,5 +35,9 @@ pub fn process_data(
         // .contraption: Uses AES only
         (Categories::Contraption, CryptoMode::Encrypt) => Ok(crypto::encrypt_contraption(data)?),
         (Categories::Contraption, CryptoMode::Decrypt) => Ok(crypto::decrypt_contraption(data)?),
+
+        // Achievements.xml: Uses AES + SHA1 Checksum
+        (Categories::Achievements, CryptoMode::Encrypt) => Ok(crypto::encrypt_achievements(data)?),
+        (Categories::Achievements, CryptoMode::Decrypt) => Ok(crypto::decrypt_achievements(data)?),
     }
 }

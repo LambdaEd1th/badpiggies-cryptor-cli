@@ -30,6 +30,15 @@ pub fn encrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
     Ok(final_data)
 }
 
+pub fn encrypt_achievements(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
+    let (key, iv) = derive_key_iv(constants::ACHIEVEMENTS_PWD)?;
+    let mut cipher_buffer = aes_encrypt(&key, &iv, buffer);
+
+    let mut final_data = sha1_checksum(&cipher_buffer);
+    final_data.append(&mut cipher_buffer);
+    Ok(final_data)
+}
+
 pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
     // Check if data is long enough to contain the header
     if buffer.len() < constants::SHA1_HEADER_LEN {
@@ -49,6 +58,25 @@ pub fn decrypt_progress(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
     }
 
     let (key, iv) = derive_key_iv(constants::PROGRESS_PWD)?;
+    aes_decrypt(&key, &iv, cipher_slice)
+}
+
+pub fn decrypt_achievements(buffer: &[u8]) -> CryptoResult<Vec<u8>> {
+    if buffer.len() < constants::SHA1_HEADER_LEN {
+        return Err(Error::Sha1HashLength(buffer.len()));
+    }
+
+    let (expected_checksum, cipher_slice) = buffer.split_at(constants::SHA1_HEADER_LEN);
+    let got_checksum = sha1_checksum(cipher_slice);
+
+    if expected_checksum != got_checksum.as_slice() {
+        return Err(Error::Sha1Checksum(
+            expected_checksum.to_vec(),
+            got_checksum,
+        ));
+    }
+
+    let (key, iv) = derive_key_iv(constants::ACHIEVEMENTS_PWD)?;
     aes_decrypt(&key, &iv, cipher_slice)
 }
 
@@ -104,6 +132,16 @@ mod tests {
         let original = b"Test Game Save Progress";
         let encrypted = encrypt_progress(original)?;
         let decrypted = decrypt_progress(&encrypted)?;
+
+        assert_eq!(original, &decrypted[..]);
+        Ok(())
+    }
+
+    #[test]
+    fn test_achievements_cycle() -> CryptoResult<()> {
+        let original = b"<Achievements><Achievement id=\"achievement_1\" progress=\"1\" completed=\"True\" synced=\"False\" /></Achievements>";
+        let encrypted = encrypt_achievements(original)?;
+        let decrypted = decrypt_achievements(&encrypted)?;
 
         assert_eq!(original, &decrypted[..]);
         Ok(())
