@@ -49,6 +49,7 @@ pub struct CryptoArgs {
 pub enum Categories {
     Progress,
     Contraption,
+    Achievements,
 }
 
 /// Arguments for the Generate command to create a template Progress.dat.xml file
@@ -125,6 +126,36 @@ impl From<Categories> for badpiggies_cryptor_core::Categories {
         match category {
             Categories::Progress => badpiggies_cryptor_core::Categories::Progress,
             Categories::Contraption => badpiggies_cryptor_core::Categories::Contraption,
+            Categories::Achievements => badpiggies_cryptor_core::Categories::Achievements,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Categories, CryptoArgs};
+    use badpiggies_cryptor_core::Categories as CoreCategories;
+    use std::path::PathBuf;
+
+    #[test]
+    fn achievements_category_maps_to_core_category() {
+        assert_eq!(
+            CoreCategories::from(Categories::Achievements),
+            CoreCategories::Achievements
+        );
+    }
+
+    #[test]
+    fn default_output_name_inserts_suffix_before_xml_extension() {
+        let args = CryptoArgs {
+            category: Categories::Achievements,
+            input: PathBuf::from("Achievements.xml"),
+            output: None,
+        };
+
+        assert_eq!(
+            args.get_output_file(badpiggies_cryptor_core::mode::CryptoMode::Encrypt),
+            PathBuf::from("Achievements_encrypted.xml")
+        );
     }
 }

@@ -2,7 +2,7 @@
 
 A fast, cross-platform command-line utility built with Rust for managing (encrypting and decrypting) user data files from the game **Bad Piggies**.
 
-This tool enables users to modify game progress (`Progress.dat`) and facilitate the sharing or editing of vehicle blueprints (`.contraption`) by reliably converting files between the game's encrypted binary format and a human-readable XML format.
+This tool enables users to modify game progress (`Progress.dat`), achievements (`Achievements.xml`), and vehicle blueprints (`.contraption`) by reliably converting files between the game's encrypted binary format and a human-readable XML format.
 
 ## Features
 
@@ -10,6 +10,7 @@ This tool enables users to modify game progress (`Progress.dat`) and facilitate 
 * **Encrypt Game Progress**: Convert an edited XML file back into the encrypted binary `Progress.dat` that the game can read.
 * **Contraption Blueprint Support**: Encrypt and decrypt individual vehicle blueprint files (`.contraption`).
 * **Generate Template**: Quickly create a template `Progress.dat.xml` file for starting new saves or testing.
+* **Achievements Support**: Encrypt and decrypt `Achievements.xml` save data.
 * **Cross-Platform**: Compatible with Windows, macOS, and Linux.
 
 ## Installation
@@ -50,7 +51,7 @@ badpiggies-cryptor-cli <COMMAND> [OPTIONS]
 | :--- | :--- |
 | `-i, --input <PATH>` | The source file path for processing. |
 | `-o, --output <PATH>` | The destination path for the result (optional). |
-| `<FILE_TYPE>` | The file format being processed. Must be either `progress` or `contraption`. |
+| `<FILE_TYPE>` | The file format being processed. Must be `progress`, `contraption`, or `achievements`. |
 
 ### File Types
 
@@ -58,6 +59,7 @@ badpiggies-cryptor-cli <COMMAND> [OPTIONS]
 | :--- | :--- |
 | `progress` | For the main game save file (`Progress.dat`). |
 | `contraption` | For individual vehicle blueprints (`.contraption`). |
+| `achievements` | For the achievements save file (`Achievements.xml`). |
 
 -----
 
@@ -95,6 +97,14 @@ Create a default template save file named `Progress.dat.xml` in the current dire
 badpiggies-cryptor-cli generate
 ```
 
+### 5\. Decrypt Achievements Data
+
+Convert an encrypted `Achievements.xml` save into editable XML.
+
+```bash
+badpiggies-cryptor-cli decrypt -i Achievements.xml -o Achievements.decrypted.xml achievements
+```
+
 -----
 
 ## Technical Specifications
@@ -103,7 +113,7 @@ The tool accurately implements the custom encryption scheme used by Bad Piggies:
 
   * **Algorithm**: **AES-256-CBC** with PKCS7 padding.
   * **Key Derivation**: **PBKDF2-HMAC-SHA1** with **1000 iterations**.
-  * **Data Integrity**: `Progress.dat` files include a **20-byte SHA1 checksum header** placed before the AES ciphertext to ensure file integrity and detect tampering.
+  * **Data Integrity**: `Progress.dat` and `Achievements.xml` files include a **20-byte SHA1 checksum header** placed before the AES ciphertext to ensure file integrity and detect tampering.
 
 -----
 
